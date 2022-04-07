@@ -7,9 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +25,11 @@ import Talan.service.people.PeopleService;
 @Controller
 public class PeopleController {
 
-	private Logger logger = LoggerFactory.getLogger(PeopleController.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
+	@Autowired(required = true)
+    @Qualifier("sqlSession_sample")
+    private SqlSession sqlSession;
 	
 	@Autowired(required=true)
 	private PeopleService service;
@@ -193,14 +198,17 @@ public class PeopleController {
 		
         logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
         
-        PeopleDTO DTO = new PeopleDTO();
+        Map<String, String> user = new HashMap<String, String>();
         
         int result = service.loginPeople( reqBodyMap );
         
         if( result == 1 ) {
         	responseBodyMap.put("rsltCode", "0000");
             responseBodyMap.put("rsltMsg", "Success");
-            session.setAttribute("DTO", DTO);
+            PeopleDTO DTO = sqlSession.selectOne("people.loginPeople", reqBodyMap);
+            user.put("loginId", DTO.getPeopleId());
+            user.put("password", DTO.getPassword());
+            session.setAttribute("user", user);
         }
         else if(result == -1) {
         	responseBodyMap.put("rsltCode", "2001");
