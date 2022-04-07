@@ -1,11 +1,15 @@
 package Talan.DTO;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class FeedCommentsDTO {
 	private String feedCommentsNumber;
 	private String feedNumber;
 	private String peopleId;
 	private String feedCommentsContent;
-	private String feedCommentsRegisterDate;
+	private Date feedCommentsRegisterDate;
 	
 	public String getFeedCommentsNumber() {
 		return feedCommentsNumber;
@@ -32,9 +36,11 @@ public class FeedCommentsDTO {
 		this.feedCommentsContent = feedCommentsContent;
 	}
 	public String getFeedCommentsRegisterDate() {
-		return feedCommentsRegisterDate;
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strFeedCommentsRegisterDate = dateFormat.format(feedCommentsRegisterDate);
+		return strFeedCommentsRegisterDate;
 	}
-	public void setFeedCommentsRegisterDate(String feedCommentsRegisterDate) {
+	public void setFeedCommentsRegisterDate(Date feedCommentsRegisterDate) {
 		this.feedCommentsRegisterDate = feedCommentsRegisterDate;
 	}
 	

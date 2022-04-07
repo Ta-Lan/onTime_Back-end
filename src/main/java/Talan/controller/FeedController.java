@@ -57,7 +57,6 @@ public class FeedController {
 			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user);
 
 			reqBodyMap.put("proId", user.get("loginId"));
-			reqBodyMap.put("feedNumber", sqlSession.selectOne("feed.setFeedNumber"));
 			reqBodyMap.put("feedWriterNickname", peopleDTO.getNickname());
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
