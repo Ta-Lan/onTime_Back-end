@@ -6,7 +6,7 @@
 <mapper namespace="feed">
 
 	<select id="setFeedNumber" resultType="String">
-		SELECT CONCAT('PRO',
+		SELECT CONCAT('FEED',
 		NVL(MAX(SUBSTR(FEED_NUMBER,4)),100000)+ 1) FROM FEED
 	</select>
 

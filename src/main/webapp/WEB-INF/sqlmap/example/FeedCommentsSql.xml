@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="feedComments">
+
+	<select id="setFeedCommentsNumber" resultType="String">
+		SELECT CONCAT('FEED_COMMENTS',
+		NVL(MAX(SUBSTR(FEED_COMMENTS_NUMBER,13)), 100000)+ 1) FROM FEED_COMMENTS
+	</select>
+	
+	<insert id="registFeedComments">
+		INSERT FEED_COMMENTS
+		VALUES (#{feedCommentsNumber}, #{feedNumber}, #{peopleId}, #{feedCommentsContent}, SYSDATE)
+	</insert>
+	
+	
+</mapper>

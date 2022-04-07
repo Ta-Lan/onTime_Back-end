@@ -45,7 +45,7 @@ public class FeedService {
             logger.info("========== 피드 등록 완료 : {}", result);
             
         }catch(Exception e){
-        	logger.error("[ERROR] insertPeople() Fail : e : {}", e.getMessage());
+        	logger.error("[ERROR] registFeed() Fail : e : {}", e.getMessage());
         	e.printStackTrace();
         	transactionManager_sample.rollback(status);    	
         }
@@ -67,7 +67,7 @@ public class FeedService {
             logger.info("========== 피드 수정 완료 : {}", result);
             
         }catch(Exception e){
-        	logger.error("[ERROR] insertPeople() Fail : e : {}", e.getMessage());
+        	logger.error("[ERROR] updateFeed() Fail : e : {}", e.getMessage());
         	e.printStackTrace();
         	transactionManager_sample.rollback(status);    	
         }
@@ -119,7 +119,7 @@ public class FeedService {
             logger.info("========== 피드 삭제 완료 : {}", result);
             
         }catch(Exception e){
-        	logger.error("[ERROR] insertPeople() Fail : e : {}", e.getMessage());
+        	logger.error("[ERROR] deleteFeed() Fail : e : {}", e.getMessage());
         	e.printStackTrace();
         	transactionManager_sample.rollback(status);    	
         }

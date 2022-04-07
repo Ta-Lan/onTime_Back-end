@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="message">
+    <sql id="getMaxNum">
+		SELECT CONCAT('MESSAGE',
+		NVL(MAX(SUBSTR(MESSAGE_NUMBER,7)),100000)+ 1) FROM MESSAGE
+    </sql>
+    <select id="getMessageInfo" parameterType="map" resultType="Talan.DTO.MessageDTO">
+        select MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT, MESSAGE_TIME
+        from MESSAGE
+        <!--        <if test="messageSender != null and messageReceiver " -->
+        where MESSAGE_SENDER = #{messageSender} and MESSAGE_RECEIVER = #{messageReceiver}
+        or MESSAGE_SENDER = #{messageReceiver} and MESSAGE_RECEIVER = #{messageSender}
+    </select>
+    <insert id="insertMessage" parameterType="map">
+        insert into MESSAGE
+        values ((<include refid="getMaxNum"/>),#{messageSender}, #{messageReceiver}, #{messageContent}, sysdate)
+    </insert>
+    <!--	<select id="getPeopleInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
+    <!--		SELECT *-->
+    <!--		FROM   PEOPLE-->
+    <!--		<if test="peopleId != null and peopleId != '' ">-->
+    <!--			WHERE PEOPLE_ID = #{peopleId}-->
+    <!--		</if>-->
+    <!--	</select>-->
+
+    <!--	<update id="updatePeople">-->
+    <!--		UPDATE PEOPLE-->
+    <!--		SET	NAME = #{name}, BIRTH = #{birth}, NICKNAME = #{nickname}, ADDRESS = #{address}, PHONE = #{phone}, INTRO = #{intro}-->
+    <!--		WHERE PEOPLE_ID = #{peopleId}-->
+    <!--	</update>-->
+    <!--	-->
+    <!--	<delete id="deletePeople">-->
+    <!--		DELETE FROM PEOPLE-->
+    <!--		WHERE  PEOPLE_ID = #{peopleId}-->
+    <!--	</delete>-->
+    <!--	-->
+    <!--	<select id="loginPeople" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
+    <!--		SELECT PEOPLE_ID, PASSWORD-->
+    <!--		FROM PEOPLE-->
+    <!--		WHERE PEOPLE_ID = #{peopleId}-->
+    <!--	</select>-->
+    <!--	-->
+    <!--	<select id="findId" parameterType="map" resultType="string">-->
+    <!--		SELECT PEOPLE_ID-->
+    <!--		FROM PEOPLE-->
+    <!--		WHERE NAME = #{name} and EMAIL = #{email}-->
+    <!--	</select>-->
+
+    <!--	<select id="isPeople" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
+    <!--		SELECT *-->
+    <!--		FROM PEOPLE-->
+    <!--		WHERE PEOPLE_ID = #{peopleId} and NAME = #{name} and EMAIL = #{email}-->
+    <!--	</select>-->
+    <!--	-->
+    <!--	<update id="changePWD">-->
+    <!--		UPDATE PEOPLE-->
+    <!--		SET PASSWORD = #{password}-->
+    <!--		WHERE PEOPLE_ID = #{peopleId}-->
+    <!--	</update>-->
+    <!--	-->
+    <!--	<select id="duplicatePeople1" resultType="Talan.DTO.PeopleDTO">-->
+    <!--		SELECT *-->
+    <!--		FROM PEOPLE-->
+    <!--		WHERE LOGIN_ID = #{loginId}-->
+    <!--	</select>-->
+    <!--	-->
+    <!--	<select id="duplicatePeople2" resultType="Talan.DTO.PeopleDTO">-->
+    <!--		SELECT *-->
+    <!--		FROM PEOPLE-->
+    <!--		WHERE NICKNAME = #{nickname}-->
+    <!--	</select>-->
+    <!--	-->
+    <!--	<select id="duplicatePeople3" resultType="Talan.DTO.PeopleDTO">-->
+    <!--		SELECT *-->
+    <!--		FROM PEOPLE-->
+    <!--		WHERE EMAIL = #{email}-->
+    <!--	</select>-->
+</mapper>

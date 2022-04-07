@@ -41,7 +41,7 @@ public class FeedDTO {
 
 	public String getFeedRegisterDate() {
 		// Date 타입으로 그냥 가져오면 날짜가 박살나니까 String 타입으로 바꾸고 Format해줬슴다. - 소담 -
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
 		String strFeedRegisterDate = dateFormat.format(feedRegisterDate);
 		return strFeedRegisterDate;
 	}
