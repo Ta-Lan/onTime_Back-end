@@ -5,10 +5,10 @@
 
 <mapper namespace="feed">
 
-	<select id="setFeedNumber" resultType="String">
+	<sql id="setFeedNumber">
 		SELECT CONCAT('FEED',
-		NVL(MAX(SUBSTR(FEED_NUMBER,4)),100000)+ 1) FROM FEED
-	</select>
+		NVL(MAX(SUBSTR(FEED_NUMBER,5)),100000)+ 1) FROM FEED
+	</sql>
 
 	<select id="getFeedNumber" resultType="String">
 		SELECT FEED_NUMBER FROM
@@ -18,7 +18,7 @@
 	<insert id="registFeed">
 		INSERT INTO FEED
 		VALUES
-		( #{feedNumber}, #{proId},
+		((<include refid="setFeedNumber"/>), #{proId},
 		SYSDATE, #{feedTitle}, #{feedContent}, #{feedWriterNickname} )
 	</insert>
 

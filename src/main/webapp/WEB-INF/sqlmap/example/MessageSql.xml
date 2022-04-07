@@ -6,7 +6,7 @@
 <mapper namespace="message">
     <sql id="getMaxNum">
 		SELECT CONCAT('MESSAGE',
-		NVL(MAX(SUBSTR(MESSAGE_NUMBER,7)),100000)+ 1) FROM MESSAGE
+		NVL(MAX(SUBSTR(MESSAGE_NUMBER,8)),100000)+ 1) FROM MESSAGE
     </sql>
     <select id="getMessageInfo" parameterType="map" resultType="Talan.DTO.MessageDTO">
         select MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT, MESSAGE_TIME
