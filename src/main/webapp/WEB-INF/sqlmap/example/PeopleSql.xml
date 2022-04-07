@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="people">
+
+	<select id="getPeopleInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">
+		SELECT *
+		FROM   PEOPLE
+		<if test="peopleId != null and peopleId != '' ">
+			WHERE PEOPLE_ID = #{peopleId}
+		</if>
+	</select>
+
+	
+	<insert id="insertPeople">
+		INSERT INTO PEOPLE
+		VALUES
+	    	( #{peopleId}, #{password}, #{name}, #{birth}, #{nickname}, #{address}, #{phone}, #{intro}, #{gender}, #{email},
+	    	 #{account}, #{originImageName}, #{storeImageName}, #{imagePath})
+	</insert>
+	
+	<update id="updatePeople">
+		UPDATE PEOPLE
+		SET	NAME = #{name}, BIRTH = #{birth}, NICKNAME = #{nickname}, ADDRESS = #{address}, PHONE = #{phone}, INTRO = #{intro}
+		WHERE PEOPLE_ID = #{peopleId}
+	</update>
+	
+	<delete id="deletePeople">
+		DELETE FROM PEOPLE
+		WHERE  PEOPLE_ID = #{peopleId}
+	</delete>
+	
+	<select id="loginPeople" parameterType="map" resultType="Talan.DTO.PeopleDTO">
+		SELECT PEOPLE_ID, PASSWORD
+		FROM PEOPLE
+		WHERE PEOPLE_ID = #{peopleId}
+	</select>
+	
+	<select id="findId" parameterType="map" resultType="string">
+		SELECT PEOPLE_ID
+		FROM PEOPLE
+		WHERE NAME = #{name} and EMAIL = #{email}
+	</select>
+
+	<select id="isPeople" parameterType="map" resultType="Talan.DTO.PeopleDTO">
+		SELECT *
+		FROM PEOPLE
+		WHERE PEOPLE_ID = #{peopleId} and NAME = #{name} and EMAIL = #{email}
+	</select>
+	
+	<update id="changePWD">
+		UPDATE PEOPLE
+		SET PASSWORD = #{password}
+		WHERE PEOPLE_ID = #{peopleId}
+	</update>
+	
+	<select id="duplicatePeople1" resultType="Talan.DTO.PeopleDTO">
+		SELECT *
+		FROM PEOPLE
+		WHERE PEOPLE_ID = #{loginId}
+	</select>
+	
+	<select id="duplicatePeople2" resultType="Talan.DTO.PeopleDTO">
+		SELECT *
+		FROM PEOPLE
+		WHERE NICKNAME = #{nickname}
+	</select>
+	
+	<select id="duplicatePeople3" resultType="Talan.DTO.PeopleDTO">
+		SELECT *
+		FROM PEOPLE
+		WHERE EMAIL = #{email}
+	</select>
+	
+</mapper>

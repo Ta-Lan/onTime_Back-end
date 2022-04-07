@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="feed">
+
+	<select id="setFeedNumber" resultType="String">
+		SELECT CONCAT('PRO',
+		NVL(MAX(SUBSTR(FEED_NUMBER,4)),100000)+ 1) FROM FEED
+	</select>
+
+	<select id="getFeedNumber" resultType="String">
+		SELECT FEED_NUMBER FROM
+		FEED WHERE PRO_ID = #{proId}
+	</select>
+
+	<insert id="registFeed">
+		INSERT INTO FEED
+		VALUES
+		( #{feedNumber}, #{proId},
+		SYSDATE, #{feedTitle}, #{feedContent}, #{feedWriterNickname} )
+	</insert>
+
+	<update id="updateFeed">
+		UPDATE FEED
+		SET FEED_TITLE = #{feedTitle},
+		FEED_CONTENT = #{feedContent},
+		FEED_REGISTER_DATE = SYSDATE
+		WHERE FEED_NUMBER = #{feedNumber} AND
+		PRO_ID = #{proId}
+	</update>
+
+	<select id="getFeed" parameterType="map"
+		resultType="Talan.DTO.FeedDTO">
+		SELECT * FROM FEED WHERE FEED_NUMBER = #{feedNumber}
+	</select>
+
+	<delete id="deleteFeed">
+		DELETE FROM FEED WHERE FEED_NUMBER = #{feedNumber}
+		AND PRO_ID = #{proId}
+	</delete>
+	
+	<select id="getLastFeedNumber" resultType="String">
+		SELECT FEED_NUMBER FROM (SELECT FEED_NUMBER, ROWNUM FROM FEED ORDER BY FEED_NUMBER DESC) WHERE ROWNUM = 1
+	</select>
+
+	<select id="getFeedList" parameterType="map" resultType="Talan.DTO.FeedDTO">
+	<![CDATA[
+		SELECT FEED_NUMBER, FEED_TITLE, FEED_CONTENT, FEED_REGISTER_DATE, PRO_ID,
+		FEED_WRITER_NICKNAME
+		FROM
+		(
+		SELECT FEED_NUMBER, FEED_TITLE, FEED_CONTENT, FEED_REGISTER_DATE, PRO_ID,
+		FEED_WRITER_NICKNAME
+		FROM
+		(
+		SELECT ROWNUM, FEED_NUMBER, FEED_TITLE, FEED_CONTENT,
+		FEED_REGISTER_DATE, PRO_ID, FEED_WRITER_NICKNAME
+		FROM
+		(
+		SELECT *
+		FROM FEED
+		ORDER BY FEED_NUMBER DESC
+		)
+		)
+		WHERE FEED_NUMBER <= #{lastFeedNumber}
+		)
+		WHERE ROWNUM <= #{cnt}
+		]]>
+	</select>
+</mapper>
