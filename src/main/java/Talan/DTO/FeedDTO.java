@@ -14,6 +14,9 @@ public class FeedDTO {
 	private String feedTitle;
 	private String feedContent;
 	private String feedWriterNickname;
+	private String StoreFileName;
+	private String OriginFileName;
+	private String FilePath;
 	
 	public Map<String, String> getFeedList() {
 		Map<String, String> feed = new HashMap<String, String>();
@@ -65,5 +68,23 @@ public class FeedDTO {
 	}
 	public void setFeedWriterNickname(String feedWriterNickname) {
 		this.feedWriterNickname = feedWriterNickname;
+	}
+	public String getStoreFileName() {
+		return StoreFileName;
+	}
+	public void setStoreFileName(String storeFileName) {
+		StoreFileName = storeFileName;
+	}
+	public String getOriginFileName() {
+		return OriginFileName;
+	}
+	public void setOriginFileName(String originFileName) {
+		OriginFileName = originFileName;
+	}
+	public String getFilePath() {
+		return FilePath;
+	}
+	public void setFilePath(String filePath) {
+		FilePath = filePath;
 	}
 }
