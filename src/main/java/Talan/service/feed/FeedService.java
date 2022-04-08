@@ -51,6 +51,28 @@ public class FeedService {
         }
 		return result;
 	}
+	
+	// Feed 등록 (with Image)
+	public int registFeedWithImage(Map<String, Object> param) {
+		//트랜잭션 구현
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager_sample.getTransaction(def);
+
+        int result = 0;
+        try{
+            result = sqlSession.insert("feed.registFeedWithImage", param);
+            
+            transactionManager_sample.commit(status);
+            logger.info("========== 피드 등록 (이미지 포함) 완료 : {}", result);
+            
+        }catch(Exception e){
+        	logger.error("[ERROR] registFeed() Fail : e : {}", e.getMessage());
+        	e.printStackTrace();
+        	transactionManager_sample.rollback(status);    	
+        }
+		return result;
+	}
 
 	// FEED 수정
 	public int updateFeed(Map<String, Object> param) {
@@ -72,6 +94,12 @@ public class FeedService {
         	transactionManager_sample.rollback(status);    	
         }
 		return result;
+	}
+	
+	// Feed 수정 (with Image)
+	public int updateFeedWithImage(Map<String, Object> param) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 	// FEED 전체 조회
@@ -127,5 +155,7 @@ public class FeedService {
         }
 		return result;
 	}
+
+
 
 }

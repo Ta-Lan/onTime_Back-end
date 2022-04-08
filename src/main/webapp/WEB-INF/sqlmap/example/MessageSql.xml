@@ -17,7 +17,7 @@
     </select>
     <insert id="insertMessage" parameterType="map">
         insert into MESSAGE
-        values ((<include refid="getMaxNum"/>),#{messageSender}, #{messageReceiver}, #{messageContent}, sysdate)
+        values ((<include refid="getMaxNum"/>),#{messageSender}, #{messageReceiver}, #{messageContent})
     </insert>
     <!--	<select id="getPeopleInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
     <!--		SELECT *-->

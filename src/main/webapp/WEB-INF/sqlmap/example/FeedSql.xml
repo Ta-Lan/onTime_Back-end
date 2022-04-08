@@ -16,10 +16,17 @@
 	</select>
 
 	<insert id="registFeed">
-		INSERT INTO FEED
+		INSERT INTO FEED( FEED_NUMBER, PRO_ID, FEED_TITLE, FEED_CONTENT, FEED_WRITER_NICKNAME)
 		VALUES
 		((<include refid="setFeedNumber"/>), #{proId},
-		SYSDATE, #{feedTitle}, #{feedContent}, #{feedWriterNickname} )
+		#{feedTitle}, #{feedContent}, #{feedWriterNickname} )
+	</insert>
+	
+	<insert id="registFeedWithImage">
+		INSERT INTO FEED( FEED_NUMBER, PRO_ID, FEED_TITLE, FEED_CONTENT, FEED_WRITER_NICKNAME, STORE_FILE_NAME, ORIGIN_FILE_NAME, FILE_PATH )
+		VALUES
+		((<include refid="setFeedNumber"/>), #{proId},
+		#{feedTitle}, #{feedContent}, #{feedWriterNickname}, #{storeFileName}, #{originFileName}, #{filePath} )
 	</insert>
 
 	<update id="updateFeed">
