@@ -12,6 +12,10 @@
 			WHERE PEOPLE_ID = #{peopleId}
 		</if>
 	</select>
+	
+	<select id="getNickname" parameterType="String" resultType="String">
+		SELECT NICKNAME FROM PEOPLE WHERE PEOPLE_ID = #{peopleId}
+	</select>
 
 	
 	<insert id="insertPeople">
