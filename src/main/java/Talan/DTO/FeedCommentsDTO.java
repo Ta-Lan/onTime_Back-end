@@ -3,6 +3,8 @@ package Talan.DTO;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FeedCommentsDTO {
 	private String feedCommentsNumber;
@@ -10,7 +12,25 @@ public class FeedCommentsDTO {
 	private String peopleId;
 	private String feedCommentsContent;
 	private Date feedCommentsRegisterDate;
+	private String nickname;
 	
+	public Map<String, String> getFeedCommentsList() {
+		Map<String, String> feedComments = new HashMap<String, String>();
+		feedComments.put("feedCommentsNumber", feedCommentsNumber);
+		feedComments.put("feedNumber", feedNumber);
+		feedComments.put("peopleId", peopleId);
+		feedComments.put("nickname", nickname);
+		feedComments.put("feedCommentsContent", feedCommentsContent);
+		feedComments.put("feedCommentsRegisterDate", getFeedCommentsRegisterDate());
+		return feedComments;
+	}
+	
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
 	public String getFeedCommentsNumber() {
 		return feedCommentsNumber;
 	}

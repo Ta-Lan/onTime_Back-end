@@ -82,8 +82,8 @@ public class FeedService {
 			param.replace("lastFeedNumber", "0", sqlSession.selectOne("feed.getLastFeedNumber"));
 		} else {
 			String strLastFeedNumber = param.get("lastFeedNumber").toString();
-			int lastFeedNumber = Integer.parseInt(strLastFeedNumber.substring(3)) - 1;
-			param.replace("lastFeedNumber", "PRO"+lastFeedNumber);
+			int lastFeedNumber = Integer.parseInt(strLastFeedNumber.substring(4)) - 1;
+			param.replace("lastFeedNumber", "FEED"+lastFeedNumber);
 		}
 
 		feed = sqlSession.selectList("feed.getFeedList", param);
@@ -114,7 +114,9 @@ public class FeedService {
         int result = 0;
         try{
             result = sqlSession.delete("feed.deleteFeed", param);
-            
+            if (result > 0) {
+            	sqlSession.delete("feed.deleteFeedComments", param);
+            }
             transactionManager_sample.commit(status);
             logger.info("========== 피드 삭제 완료 : {}", result);
             

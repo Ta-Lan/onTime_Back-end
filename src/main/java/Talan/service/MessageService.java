@@ -36,7 +36,6 @@ public class MessageService {
     private DataSourceTransactionManager transactionManager_sample;
 
     //메시지 가져오기
-
     public List<MessageDTO> getMessageInfo(Map<String, Object> param) {
         return sqlSession.selectList("message.getMessageInfo", param);
     }

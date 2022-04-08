@@ -61,7 +61,7 @@ public class MessageDTO {
                 ", messageSender='" + messageSender + '\'' +
                 ", messageReceiver='" + messageReceiver + '\'' +
                 ", messageContent='" + messageContent + '\'' +
-                ", messageTime=" + messageTime +
+                ", messageTime=" + getMessageTime() +
                 '}';
     }
 

@@ -41,6 +41,10 @@
 		AND PRO_ID = #{proId}
 	</delete>
 	
+	<delete id="deleteFeedComments">
+		DELETE FROM FEED_COMMENTS WHERE FEED_NUMBER = #{feedNumber}
+	</delete>
+	
 	<select id="getLastFeedNumber" resultType="String">
 		SELECT FEED_NUMBER FROM (SELECT FEED_NUMBER, ROWNUM FROM FEED ORDER BY FEED_NUMBER DESC) WHERE ROWNUM = 1
 	</select>
