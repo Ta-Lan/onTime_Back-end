@@ -117,7 +117,7 @@ public class PeopleController {
 
 		//////////////////////////// IMAGE UPLOAD////////////////////////////
 
-		String fileDir = "/view/image/profileImage";
+		String fileDir = "/image/profileImage";
 		String filePath = request.getServletContext().getRealPath(fileDir);
 		System.out.println(filePath);
 		MultipartFile image = null;

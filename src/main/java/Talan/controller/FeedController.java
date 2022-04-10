@@ -85,16 +85,15 @@ public class FeedController {
 
 		return mv;
 	}
-	
+
 	// FEED 등록 (with Image)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/registWithImage")
-	public ModelAndView registFeedWithImage(MultipartHttpServletRequest request, HttpServletResponse response, HttpSession session) {
+	public ModelAndView registFeedWithImage(MultipartHttpServletRequest request, HttpServletResponse response,
+			HttpSession session) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = new HashMap<String, Object>();
 		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
-		reqBodyMap.put("feedTitle", request.getParameter("feedTitle"));
-		reqBodyMap.put("feedContent", request.getParameter("feedContent"));
 
 		if (reqHeadMap == null) {
 			reqHeadMap = new HashMap<String, Object>();
@@ -110,33 +109,37 @@ public class FeedController {
 
 			reqBodyMap.put("proId", user.get("loginId"));
 			reqBodyMap.put("feedWriterNickname", peopleDTO.getNickname());
-			
-			////////////////////////////IMAGE UPLOAD////////////////////////////
-			
-			String fileDir = "/view/image/feedImage";
+			reqBodyMap.put("feedTitle", request.getParameter("feedTitle"));
+			reqBodyMap.put("feedContent", request.getParameter("feedContent"));
+
+			//////////////////////////// IMAGE UPLOAD////////////////////////////
+
+			String fileDir = "/image/feedImage";
 			String filePath = request.getServletContext().getRealPath(fileDir);
 			System.out.println(filePath);
 			MultipartFile image = request.getFile("image");
 			String originalFile = image.getOriginalFilename();
-			
-			//.png
+
+			// .png
 			String extension = originalFile.substring(originalFile.lastIndexOf("."));
-			
-			//7b2582aca35e4525b4a579d84e8b6c9d
+
+			// 7b2582aca35e4525b4a579d84e8b6c9d
 			String storeName = UUID.randomUUID().toString().replace("-", "");
-			
-			String storeFileName=storeName + extension;
-			
+
+			String storeFileName = storeName + extension;
+
 			File file = new File(filePath + "/" + storeFileName);
 			try {
-			image.transferTo(file); // 파일을 저장
-			}catch(Exception e) {e.printStackTrace();}
-			
+				image.transferTo(file); // 파일을 저장
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			reqBodyMap.put("storeFileName", storeFileName);
 			reqBodyMap.put("originFileName", originalFile);
 			reqBodyMap.put("filePath", filePath);
-			
-			////////////////////////////IMAGE UPLOAD////////////////////////////
+
+			//////////////////////////// IMAGE UPLOAD////////////////////////////
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
@@ -160,51 +163,86 @@ public class FeedController {
 
 		return mv;
 	}
-	
+
 	// FEED 전체 조회
-		@RequestMapping(method = RequestMethod.POST, value = "/api/feed/list")
-		public ModelAndView feedList(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/list")
+	public ModelAndView feedList(HttpServletRequest request, HttpServletResponse response) {
 
-			Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
-			Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
-			Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
 
-			if (reqHeadMap == null) {
-				reqHeadMap = new HashMap<String, Object>();
-			}
-
-			reqHeadMap.put(Const.RESULT_CODE, Const.OK);
-			reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
-			
-			/*
-			 * "body" : {
-			 * "lastFeedNumber" : "첫 번째에 보여질 피드 번호",
-			 * "cnt" : "가져올 피드의 갯수"
-			 * */ 
-
-			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
-
-			List<Object> list = service.feedList(reqBodyMap);
-
-			Map<String, Object> lastFeed = new HashMap<String, Object>();
-			lastFeed = (Map<String, Object>) list.get(Integer.parseInt(reqBodyMap.get("cnt").toString())-1);
-
-			if (!StringUtils.isEmpty(list)) {
-				responseBodyMap.put("rsltCode", "0000");
-				responseBodyMap.put("rsltMsg", "Success");
-				responseBodyMap.put("lastFeedNumber", lastFeed.get("feedNumber"));
-				responseBodyMap.put("list", list);
-			} else {
-				responseBodyMap.put("rsltCode", "2003");
-				responseBodyMap.put("rsltMsg", "Data not found.");
-			}
-
-			ModelAndView mv = new ModelAndView("defaultJsonView");
-			mv.addObject(Const.HEAD, reqHeadMap);
-			mv.addObject(Const.BODY, responseBodyMap);
-
-			return mv;
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
 		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		/*
+		 * "body" : { "lastFeedNumber" : "첫 번째에 보여질 피드 번호 , 0이면 최신순 ", "cnt" :
+		 * "가져올 피드의 갯수, 0이거나 전체피드 개수보다 큰 값이 입력되면 전체 피드를 가져온다"
+		 */
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+		List<Object> list = service.feedList(reqBodyMap);
+
+		Map<String, Object> lastFeed = new HashMap<String, Object>();
+		lastFeed = (Map<String, Object>) list.get(Integer.parseInt(reqBodyMap.get("cnt").toString()) - 1);
+
+		if (!StringUtils.isEmpty(list)) {
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+			responseBodyMap.put("lastFeedNumber", lastFeed.get("feedNumber"));
+			responseBodyMap.put("list", list);
+		} else {
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
+	// PRO 개인 피드 조회
+	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/proList")
+	public ModelAndView feedProList(HttpServletRequest request, HttpServletResponse response) {
+
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+		List<Object> list = service.feedProList(reqBodyMap);
+
+		if (!StringUtils.isEmpty(list)) {
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+			responseBodyMap.put("proFeedCount", sqlSession.selectOne("feed.getFeedProCnt", reqBodyMap));
+			responseBodyMap.put("list", list);
+		} else {
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
 
 	// FEED 상세 조회
 	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/detail")
@@ -232,11 +270,11 @@ public class FeedController {
 			responseBodyMap.put("feedTitle", feed.getFeedTitle());
 			responseBodyMap.put("feedContent", feed.getFeedContent());
 			responseBodyMap.put("feedWriterNickname", feed.getFeedWriterNickname());
-			responseBodyMap.put("feedRegisterDate", feed.getFeedRegisterDate());	
-			responseBodyMap.put("storeFileName", feed.getStoreFileName());	
-			responseBodyMap.put("originFileName", feed.getOriginFileName());	
-			responseBodyMap.put("filePath", feed.getFilePath());	
-			
+			responseBodyMap.put("feedRegisterDate", feed.getFeedRegisterDate());
+			responseBodyMap.put("storeFileName", feed.getStoreFileName());
+			responseBodyMap.put("originFileName", feed.getOriginFileName());
+			responseBodyMap.put("filePath", feed.getFilePath());
+
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
@@ -273,9 +311,8 @@ public class FeedController {
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 			/*
-			 * body에 들어가는 값은 proId, feedNumber, feedTitle, feedContent 
-			 * proId는 세션으로 미리 put 해주었고, 
-			 * feedNumber는 프론트에서 버튼 처리할 때 data.param으로 넘겨주도록 합시다.
+			 * body에 들어가는 값은 proId, feedNumber, feedTitle, feedContent proId는 세션으로 미리 put
+			 * 해주었고, feedNumber는 프론트에서 버튼 처리할 때 data.param으로 넘겨주도록 합시다.
 			 */
 
 			int result = service.updateFeed(reqBodyMap);
@@ -298,15 +335,15 @@ public class FeedController {
 
 		return mv;
 	}
-	
+
 	// FEED 수정 (with Image)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/updateWithImage")
-	public ModelAndView updateFeedWithImage(MultipartHttpServletRequest request, HttpServletResponse response, HttpSession session) {
+	public ModelAndView updateFeedWithImage(MultipartHttpServletRequest request, HttpServletResponse response,
+			HttpSession session) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = new HashMap<String, Object>();
 		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
-		
 
 		if (reqHeadMap == null) {
 			reqHeadMap = new HashMap<String, Object>();
@@ -324,41 +361,41 @@ public class FeedController {
 			reqBodyMap.put("feedNumber", request.getParameter("feedNumber"));
 			reqBodyMap.put("feedTitle", request.getParameter("feedTitle"));
 			reqBodyMap.put("feedContent", request.getParameter("feedContent"));
-			
-			////////////////////////////IMAGE UPLOAD////////////////////////////
-			
-			String fileDir = "/view/image/feedImage";
+
+			//////////////////////////// IMAGE UPLOAD////////////////////////////
+
+			String fileDir = "/image/feedImage";
 			String filePath = request.getServletContext().getRealPath(fileDir);
 			System.out.println(filePath);
 			MultipartFile image = request.getFile("image");
 			String originalFile = image.getOriginalFilename();
-			
-			//.png
+
+			// .png
 			String extension = originalFile.substring(originalFile.lastIndexOf("."));
-			
-			//7b2582aca35e4525b4a579d84e8b6c9d
+
+			// 7b2582aca35e4525b4a579d84e8b6c9d
 			String storeName = UUID.randomUUID().toString().replace("-", "");
-			
-			String storeFileName=storeName + extension;
-			
+
+			String storeFileName = storeName + extension;
+
 			File file = new File(filePath + "/" + storeFileName);
 			try {
-			image.transferTo(file); // 파일을 저장
-			}catch(Exception e) {e.printStackTrace();}
-			
+				image.transferTo(file); // 파일을 저장
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			reqBodyMap.put("storeFileName", storeFileName);
 			reqBodyMap.put("originFileName", originalFile);
 			reqBodyMap.put("filePath", filePath);
-			
-			////////////////////////////IMAGE UPLOAD////////////////////////////
-			
+
+			//////////////////////////// IMAGE UPLOAD////////////////////////////
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 			/*
-			 * body에 들어가는 값은 proId, feedNumber, feedTitle, feedContent 
-			 * proId는 세션으로 미리 put 해주었고, 
-			 * feedNumber는 프론트에서 버튼 처리할 때 data.param으로 넘겨주도록 합시다.
+			 * body에 들어가는 값은 proId, feedNumber, feedTitle, feedContent proId는 세션으로 미리 put
+			 * 해주었고, feedNumber는 프론트에서 버튼 처리할 때 data.param으로 넘겨주도록 합시다.
 			 */
 
 			int result = service.updateFeedWithImage(reqBodyMap);
@@ -381,7 +418,7 @@ public class FeedController {
 
 		return mv;
 	}
-	
+
 	// FEED 삭제
 	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/delete")
 	public ModelAndView deleteFeed(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
