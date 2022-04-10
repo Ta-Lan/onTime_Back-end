@@ -301,11 +301,12 @@ public class FeedController {
 	
 	// FEED 수정 (with Image)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/updateWithImage")
-	public ModelAndView updateFeedWithImage(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+	public ModelAndView updateFeedWithImage(MultipartHttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
-		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> reqBodyMap = new HashMap<String, Object>();
 		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+		
 
 		if (reqHeadMap == null) {
 			reqHeadMap = new HashMap<String, Object>();
@@ -315,10 +316,42 @@ public class FeedController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
 		if (session.getAttribute("user") != null) {
-
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
+			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user);
+
 			reqBodyMap.put("proId", user.get("loginId"));
+			reqBodyMap.put("feedNumber", request.getParameter("feedNumber"));
+			reqBodyMap.put("feedTitle", request.getParameter("feedTitle"));
+			reqBodyMap.put("feedContent", request.getParameter("feedContent"));
+			
+			////////////////////////////IMAGE UPLOAD////////////////////////////
+			
+			String fileDir = "/view/image/feedImage";
+			String filePath = request.getServletContext().getRealPath(fileDir);
+			System.out.println(filePath);
+			MultipartFile image = request.getFile("image");
+			String originalFile = image.getOriginalFilename();
+			
+			//.png
+			String extension = originalFile.substring(originalFile.lastIndexOf("."));
+			
+			//7b2582aca35e4525b4a579d84e8b6c9d
+			String storeName = UUID.randomUUID().toString().replace("-", "");
+			
+			String storeFileName=storeName + extension;
+			
+			File file = new File(filePath + "/" + storeFileName);
+			try {
+			image.transferTo(file); // 파일을 저장
+			}catch(Exception e) {e.printStackTrace();}
+			
+			reqBodyMap.put("storeFileName", storeFileName);
+			reqBodyMap.put("originFileName", originalFile);
+			reqBodyMap.put("filePath", filePath);
+			
+			////////////////////////////IMAGE UPLOAD////////////////////////////
+			
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
