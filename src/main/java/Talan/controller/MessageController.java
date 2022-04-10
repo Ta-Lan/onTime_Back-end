@@ -37,7 +37,6 @@ public class MessageController {
     @Autowired(required=true)
     private MessageService service;
 
-    private Gson gson = new Gson();
     // 한 채팅방 대화가져오기
     @RequestMapping(method = RequestMethod.POST, value = "/api/message/info")
     public ModelAndView getMessageInfo(HttpServletRequest request, HttpServletResponse response){

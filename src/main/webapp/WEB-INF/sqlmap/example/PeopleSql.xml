@@ -60,22 +60,24 @@
 		WHERE PEOPLE_ID = #{peopleId}
 	</update>
 	
-	<select id="duplicatePeople1" resultType="Talan.DTO.PeopleDTO">
-		SELECT *
+	<select id="duplicatePeople1" resultType="String">
+		SELECT PEOPLE_ID
 		FROM PEOPLE
-		WHERE PEOPLE_ID = #{loginId}
+		WHERE PEOPLE_ID = #{peopleId}
 	</select>
 	
-	<select id="duplicatePeople2" resultType="Talan.DTO.PeopleDTO">
-		SELECT *
+	<select id="duplicatePeople2" resultType="String">
+		SELECT EMAIL
+		FROM PEOPLE
+		WHERE EMAIL = #{email}
+	</select>
+	
+	<select id="duplicatePeople3" resultType="String">
+		SELECT NICKNAME
 		FROM PEOPLE
 		WHERE NICKNAME = #{nickname}
 	</select>
 	
-	<select id="duplicatePeople3" resultType="Talan.DTO.PeopleDTO">
-		SELECT *
-		FROM PEOPLE
-		WHERE EMAIL = #{email}
-	</select>
+
 	
 </mapper>

@@ -171,6 +171,26 @@ public class PeopleService {
 			return 0;
 		}
 	}
+	
+	//이메일 중복확인
+	public int duplicatePeople2(Map<String, Object> param) {
+		if(sqlSession.selectOne("people.duplicatePeople2", param) != null) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	
+	//닉네임 중복확인
+	public int duplicatePeople3(Map<String, Object> param) {
+		if(sqlSession.selectOne("people.duplicatePeople3", param) != null) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
 
 	
 

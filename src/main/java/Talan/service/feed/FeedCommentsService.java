@@ -54,7 +54,7 @@ public class FeedCommentsService {
 	}
 
 	// Feed 댓글 조회
-	public List<Object> readFeedCommentsList(Map<String, Object> param) {
+	public List<Object> detailFeedCommentsList(Map<String, Object> param) {
 		List<FeedCommentsDTO> feedComments = new ArrayList<FeedCommentsDTO>();
 		feedComments = sqlSession.selectList("feedComments.getFeedCommentsList", param);
 		List<Object> list = new ArrayList<Object>();

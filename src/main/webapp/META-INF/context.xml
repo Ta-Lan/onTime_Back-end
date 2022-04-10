@@ -16,13 +16,13 @@
         minIdle="5"
         maxWait="-1"/> -->
         
-    <Resource name="jdbc/msp_oracle"
+   <Resource name="jdbc/msp_oracle"
         auth="Container"
         type="javax.sql.DataSource"
         driverClassName="oracle.jdbc.OracleDriver"
-        url="jdbc:oracle:thin:@localhost:1521:xe"
-        username="ontime"
-        password="ontime"
+        url="jdbc:oracle:thin:@192.168.0.39:1521:xe"
+        username="talan"
+        password="20220420"
         maxActive="20"
         maxIdle="10"
         minIdle="5"

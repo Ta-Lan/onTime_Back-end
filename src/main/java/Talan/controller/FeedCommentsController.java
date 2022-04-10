@@ -76,8 +76,8 @@ public class FeedCommentsController {
 	}
 
 	// FEED 댓글 조회
-	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/commentsRead")
-	public ModelAndView readFeedCommentsList(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(method = RequestMethod.POST, value = "/api/feed/commentsDetail")
+	public ModelAndView detailFeedCommentsList(HttpServletRequest request, HttpServletResponse response) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -94,7 +94,7 @@ public class FeedCommentsController {
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		List<Object> list = service.readFeedCommentsList(reqBodyMap);
+		List<Object> list = service.detailFeedCommentsList(reqBodyMap);
 
 		if (!StringUtils.isEmpty(list)) {
 			responseBodyMap.put("rsltCode", "0000");

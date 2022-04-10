@@ -16,8 +16,8 @@
         or MESSAGE_SENDER = #{messageReceiver} and MESSAGE_RECEIVER = #{messageSender}
     </select>
     <insert id="insertMessage" parameterType="map">
-        insert into MESSAGE
-        values ((<include refid="getMaxNum"/>),#{messageSender}, #{messageReceiver}, #{messageContent}, sysdate)
+        insert into MESSAGE (MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT)
+        values ((<include refid="getMaxNum"/>),#{messageSender}, #{messageReceiver}, #{messageContent})
     </insert>
     <!--	<select id="getPeopleInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
     <!--		SELECT *-->
@@ -26,7 +26,6 @@
     <!--			WHERE PEOPLE_ID = #{peopleId}-->
     <!--		</if>-->
     <!--	</select>-->
-
     <!--	<update id="updatePeople">-->
     <!--		UPDATE PEOPLE-->
     <!--		SET	NAME = #{name}, BIRTH = #{birth}, NICKNAME = #{nickname}, ADDRESS = #{address}, PHONE = #{phone}, INTRO = #{intro}-->

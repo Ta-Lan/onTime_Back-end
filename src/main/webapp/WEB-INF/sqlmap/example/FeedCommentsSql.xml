@@ -12,7 +12,7 @@
 	
 	<insert id="registFeedComments">
 		INSERT INTO FEED_COMMENTS
-		VALUES ((<include refid="setFeedCommentsNumber"/>), #{feedNumber}, #{peopleId}, #{feedCommentsContent}, SYSDATE)
+		VALUES ((<include refid="setFeedCommentsNumber"/>), #{feedNumber}, #{peopleId}, #{feedCommentsContent})
 	</insert>
 	
 	<select id="getFeedCommentsList" parameterType="map" resultType="Talan.DTO.FeedCommentsDTO">
