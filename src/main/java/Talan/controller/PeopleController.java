@@ -65,14 +65,12 @@ public class PeopleController {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
 			responseBodyMap.put("name", info.getName());
-			responseBodyMap.put("birth", info.getBirth());
 			responseBodyMap.put("nickname", info.getNickname());
 			responseBodyMap.put("address", info.getAddress());
 			responseBodyMap.put("phone", info.getPhone());
 			responseBodyMap.put("intro", info.getIntro());
-			responseBodyMap.put("gender", info.getGender());
 			responseBodyMap.put("email", info.getEmail());
-			responseBodyMap.put("account", info.getImagePath());
+			responseBodyMap.put("account", info.getAccount());
 			responseBodyMap.put("originImageName", info.getOriginImageName());
 			responseBodyMap.put("storeImageName", info.getStoreImageName());
 			responseBodyMap.put("imagePath", info.getImagePath());
@@ -287,7 +285,12 @@ public class PeopleController {
 		PeopleDTO DTO = sqlSession.selectOne("people.getSession", reqBodyMap);
 		
 		int result = service.loginPeople(reqBodyMap);
-		int isPro = proService.isProRegisted(DTO.getPeopleId());
+		int proRegisted = proService.isProRegisted(DTO.getPeopleId());
+		boolean isPro = false;
+		
+		if (proRegisted == 1) {
+			isPro = true;
+		}
 
 		if (result == 1) {
 			responseBodyMap.put("rsltCode", "0000");
@@ -296,7 +299,8 @@ public class PeopleController {
 			user.put("password", DTO.getPassword());
 			session.setAttribute("user", user);
 			responseBodyMap.put("session", DTO);
-			//responseBodyMap.put("isProRegisted", );
+			responseBodyMap.put("isProRegisted", isPro);
+			
 			
 		} else if (result == -1) {
 			responseBodyMap.put("rsltCode", "2001");

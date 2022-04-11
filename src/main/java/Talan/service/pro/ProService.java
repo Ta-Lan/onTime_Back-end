@@ -51,8 +51,8 @@ public class ProService {
 
 	// PRO 확인
 	public int isProRegisted(String peopleId) {
-		int result = 0;
-		
+		int result = sqlSession.selectOne("pro.isProRegisted", peopleId);
+		return result;
 	}
 	
 	
