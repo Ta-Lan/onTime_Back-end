@@ -11,4 +11,8 @@
 		( #{proId}, #{kindScore}, #{category}, #{license} )
 	</insert>
 	
+	<select id="isProRegisted">
+		SELECT PRO_ID FROM WHERE PRO_ID = #{peopleId}
+	</select>
+	
 </mapper>

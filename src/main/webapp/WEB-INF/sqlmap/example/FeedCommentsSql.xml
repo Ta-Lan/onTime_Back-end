@@ -6,13 +6,13 @@
 <mapper namespace="feedComments">
 
 	<sql id="setFeedCommentsNumber" >
-		SELECT CONCAT('FEED_COMMENTS',
-		NVL(MAX(SUBSTR(FEED_COMMENTS_NUMBER,14)),100000)+ 1) FROM FEED_COMMENTS
+		SELECT CONCAT('FEEDCOMMENTS',
+		NVL(MAX(SUBSTR(FEED_COMMENTS_NUMBER,13)),100000)+ 1) FROM FEED_COMMENTS
 	</sql>
 	
 	<insert id="registFeedComments">
 		INSERT INTO FEED_COMMENTS
-		VALUES ((<include refid="setFeedCommentsNumber"/>), #{feedNumber}, #{peopleId}, #{feedCommentsContent})
+		VALUES ((<include refid="setFeedCommentsNumber"/>), #{feedNumber}, #{peopleId}, #{feedCommentsContent}, SYSDATE)
 	</insert>
 	
 	<select id="getFeedCommentsList" parameterType="map" resultType="Talan.DTO.FeedCommentsDTO">

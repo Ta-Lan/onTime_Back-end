@@ -1,8 +1,6 @@
 package Talan.controller;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -25,8 +23,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import Talan.DTO.PeopleDTO;
-import kr.msp.constant.Const;
 import Talan.service.people.PeopleService;
+import Talan.service.pro.ProService;
+import kr.msp.constant.Const;
 
 @Controller
 public class PeopleController {
@@ -39,6 +38,9 @@ public class PeopleController {
 
 	@Autowired(required = true)
 	private PeopleService service;
+	@Autowired(required = true)
+	private ProService proService;
+	
 
 	// 회원정보
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/info")
@@ -87,14 +89,48 @@ public class PeopleController {
 		return mv;
 	}
 
-	// 회원가입
+	// 회원가입 (이미지X)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/join")
+	public ModelAndView regPeople(HttpServletRequest request, HttpServletResponse response) {
+
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+		int result = service.insertPeople(reqBodyMap);
+
+		if (result > 0) {
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+		} else {
+
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+		return mv;
+	}
+
+	// 회원가입 (이미지)
+	@RequestMapping(method = RequestMethod.POST, value = "/api/people/joinWithImage")
 	public ModelAndView regPeople(MultipartHttpServletRequest request, HttpServletResponse response) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = new HashMap<String, Object>();
 		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
-		
+
 		reqBodyMap.put("peopleId", request.getParameter("peopleId"));
 		reqBodyMap.put("password", request.getParameter("password"));
 		reqBodyMap.put("name", request.getParameter("name"));
@@ -106,8 +142,7 @@ public class PeopleController {
 		reqBodyMap.put("gender", request.getParameter("gender"));
 		reqBodyMap.put("email", request.getParameter("email"));
 		reqBodyMap.put("account", request.getParameter("account"));
-		
-		
+
 		if (reqHeadMap == null) {
 			reqHeadMap = new HashMap<String, Object>();
 		}
@@ -117,45 +152,37 @@ public class PeopleController {
 
 		//////////////////////////// IMAGE UPLOAD////////////////////////////
 
-		String fileDir = "/view/image/profileImage";
+		String fileDir = "/image/profileImage";
 		String filePath = request.getServletContext().getRealPath(fileDir);
 		System.out.println(filePath);
-		MultipartFile image = null;
-		if (request.getFile("image") != null) {
-			image = request.getFile("image");
-			
-			String originalFile = image.getOriginalFilename();
+		MultipartFile image = request.getFile("image");
 
-			// .png
-			String extension = originalFile.substring(originalFile.lastIndexOf("."));
+		String originalFile = image.getOriginalFilename();
 
-			// 7b2582aca35e4525b4a579d84e8b6c9d
-			String storeName = UUID.randomUUID().toString().replace("-", "");
+		// .png
+		String extension = originalFile.substring(originalFile.lastIndexOf("."));
 
-			String storeFileName = storeName + extension;
+		// 7b2582aca35e4525b4a579d84e8b6c9d
+		String storeName = UUID.randomUUID().toString().replace("-", "");
 
-			File file = new File(filePath + "/" + storeFileName);
-			try {
-				image.transferTo(file); // 파일을 저장
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		String storeFileName = storeName + extension;
 
-			reqBodyMap.put("storeImageName", storeFileName);
-			reqBodyMap.put("originImageName", originalFile);
-			reqBodyMap.put("imagePath", filePath);
-		} else {
-			reqBodyMap.put("storeImageName", "");
-			reqBodyMap.put("originImageName", "");
-			reqBodyMap.put("imagePath", "");
+		File file = new File(filePath + "/" + storeFileName);
+		try {
+			image.transferTo(file); // 파일을 저장
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
+
+		reqBodyMap.put("storeImageName", storeFileName);
+		reqBodyMap.put("originImageName", originalFile);
+		reqBodyMap.put("imagePath", filePath);
 
 		//////////////////////////// IMAGE UPLOAD////////////////////////////
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		int result = service.insertPeople(reqBodyMap);
+		int result = service.insertPeopleWithImage(reqBodyMap);
 
 		if (result > 0) {
 			responseBodyMap.put("rsltCode", "0000");
@@ -257,15 +284,20 @@ public class PeopleController {
 
 		Map<String, String> user = new HashMap<String, String>();
 
+		PeopleDTO DTO = sqlSession.selectOne("people.getSession", reqBodyMap);
+		
 		int result = service.loginPeople(reqBodyMap);
+		int isPro = proService.isProRegisted(DTO.getPeopleId());
 
 		if (result == 1) {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
-			PeopleDTO DTO = sqlSession.selectOne("people.loginPeople", reqBodyMap);
 			user.put("loginId", DTO.getPeopleId());
 			user.put("password", DTO.getPassword());
 			session.setAttribute("user", user);
+			responseBodyMap.put("session", DTO);
+			//responseBodyMap.put("isProRegisted", );
+			
 		} else if (result == -1) {
 			responseBodyMap.put("rsltCode", "2001");
 			responseBodyMap.put("rsltMsg", "ID or PWD not correct");
@@ -455,8 +487,8 @@ public class PeopleController {
 
 		return mv;
 	}
-	
-	// 이메일 중복확인 
+
+	// 이메일 중복확인
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/duplicate2")
 	public ModelAndView duplicatepeople2(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
@@ -490,7 +522,7 @@ public class PeopleController {
 
 		return mv;
 	}
-	
+
 	// 닉네임 중복확인
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/duplicate3")
 	public ModelAndView duplicatepeople3(HttpServletRequest request, HttpServletResponse response) {

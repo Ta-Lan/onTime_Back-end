@@ -8,8 +8,8 @@
 	<select id="getPeopleInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">
 		SELECT *
 		FROM   PEOPLE
-		<if test="peopleId != null and peopleId != '' ">
-			WHERE PEOPLE_ID = #{peopleId}
+		<if test="loginId != null and loginId != '' ">
+			WHERE PEOPLE_ID = #{loginId}
 		</if>
 	</select>
 	
@@ -19,10 +19,15 @@
 
 	
 	<insert id="insertPeople">
-		INSERT INTO PEOPLE
+		INSERT INTO PEOPLE (PEOPLE_ID, PASSWORD, NAME, BIRTH, NICKNAME, ADDRESS, PHONE, INTRO, GENDER, EMAIL, ACCOUNT)
 		VALUES
 	    	( #{peopleId}, #{password}, #{name}, #{birth}, #{nickname}, #{address}, #{phone}, #{intro}, #{gender}, #{email},
-	    	 #{account}, #{originImageName}, #{storeImageName}, #{imagePath})
+	    	 #{account})
+	</insert>
+	
+	<insert id="insertPeopleWithImage">
+		INSERT INTO PEOPLE VALUES (#{peopleId}, #{password}, #{name}, #{birth}, #{nickname}, #{address}, #{phone}, #{intro}, #{gender}, #{email},
+	    	 #{account}, #{storeImageName}, #{originImageName}, #{filePath})
 	</insert>
 	
 	<update id="updatePeople">
@@ -36,8 +41,8 @@
 		WHERE  PEOPLE_ID = #{peopleId}
 	</delete>
 	
-	<select id="loginPeople" parameterType="map" resultType="Talan.DTO.PeopleDTO">
-		SELECT PEOPLE_ID, PASSWORD
+	<select id="getSession" parameterType="map" resultType="Talan.DTO.PeopleDTO">
+		SELECT *
 		FROM PEOPLE
 		WHERE PEOPLE_ID = #{peopleId}
 	</select>

@@ -37,6 +37,18 @@
 		WHERE FEED_NUMBER = #{feedNumber} AND
 		PRO_ID = #{proId}
 	</update>
+	
+	<update id="updateFeedWithImage">
+		UPDATE FEED
+		SET FEED_TITLE = #{feedTitle},
+		FEED_CONTENT = #{feedContent},
+		FEED_REGISTER_DATE = SYSDATE,
+		STORE_FILE_NAME = #{storeFileName},
+		ORIGIN_FILE_NAME = #{originFileName},
+		FILE_PATH = #{filePath}
+		WHERE FEED_NUMBER = #{feedNumber} AND
+		PRO_ID = #{proId}
+	</update>
 
 	<select id="getFeed" parameterType="map"
 		resultType="Talan.DTO.FeedDTO">
@@ -79,5 +91,20 @@
 		)
 		WHERE ROWNUM <= #{cnt}
 		]]>
+	</select>
+	
+	<select id="getFeedCnt" resultType="Integer">
+		SELECT COUNT(*) AS cnt FROM FEED
+	</select>
+	
+	<select id="getFeedProList" parameterType="map" resultType="Talan.DTO.FeedDTO">
+		SELECT *
+		FROM FEED 
+		WHERE PRO_ID = #{proId}
+		ORDER BY FEED_NUMBER asc
+	</select>
+	
+	<select id="getFeedProCnt" resultType="Integer">
+		SELECT COUNT(*) AS cnt FROM FEED WHERE PRO_ID = #{proId}
 	</select>
 </mapper>
