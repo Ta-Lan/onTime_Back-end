@@ -274,6 +274,7 @@ public class FeedController {
 			responseBodyMap.put("storeFileName", feed.getStoreFileName());
 			responseBodyMap.put("originFileName", feed.getOriginFileName());
 			responseBodyMap.put("filePath", feed.getFilePath());
+			responseBodyMap.put("feedWriterId", feed.getProId());
 
 		} else {
 			responseBodyMap.put("rsltCode", "2003");

@@ -18,7 +18,7 @@ import Talan.DTO.PeopleDTO;
 @Service
 public class PeopleService {
 	
-	private Logger logger = LoggerFactory.getLogger(PeopleService.class);
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired(required=true)
     @Qualifier("sqlSession_sample")
@@ -44,6 +44,29 @@ public class PeopleService {
         try{
            
             result = sqlSession.insert("people.insertPeople", param);
+            
+            transactionManager_sample.commit(status);
+            logger.info("========== 유저 등록 완료 : {}", result);
+            
+        }catch(Exception e){
+        	logger.error("[ERROR] insertPeople() Fail : e : {}", e.getMessage());
+        	e.printStackTrace();
+        	transactionManager_sample.rollback(status);    	
+        }
+		return result;
+	}
+	
+	//회원가입 (+프로필사진)
+	public int insertPeopleWithImage(Map<String, Object> param) {
+		//트랜잭션 구현
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager_sample.getTransaction(def);
+
+        int result = 0;
+        try{
+           
+            result = sqlSession.insert("people.insertPeopleWithImage", param);
             
             transactionManager_sample.commit(status);
             logger.info("========== 유저 등록 완료 : {}", result);
@@ -107,7 +130,7 @@ public class PeopleService {
 	public int loginPeople(Map<String, Object> param) {
         int result = 0;
         try{        
-        	PeopleDTO info = sqlSession.selectOne("people.loginPeople", param);
+        	PeopleDTO info = sqlSession.selectOne("people.getSession", param);
         	if( param.get("password").equals(info.getPassword()) ) {
         		result = 1;
         	}
@@ -191,6 +214,7 @@ public class PeopleService {
 			return 0;
 		}
 	}
+
 
 	
 

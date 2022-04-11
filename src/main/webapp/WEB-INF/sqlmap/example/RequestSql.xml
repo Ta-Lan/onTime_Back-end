@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="request">
+	
+	<sql id="setRequestNumber" >
+		SELECT CONCAT('REQUEST',
+		NVL(MAX(SUBSTR(REQUEST_NUMBER,8)),100000)+ 1) FROM REQUEST
+	</sql>
+	
+	<insert id="registRequest">
+		INSERT INTO REQUEST
+		VALUES
+		( (<include refid="setRequestNumber"/>), #{peopleId}, #{category}, #{requestDate}, #{requestTitle}, #{requestContent}, #{preference}, SYSDATE, 0, #{town}, #{district}, #{taskLevel} )
+	</insert>
+	
+</mapper>

@@ -1,5 +1,7 @@
 package Talan.DTO;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class RequestDTO {
@@ -34,8 +36,10 @@ public class RequestDTO {
 	public void setCategory(String category) {
 		this.category = category;
 	}
-	public Date getRequestDate() {
-		return requestDate;
+	public String getRequestDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strRequestDate = dateFormat.format(requestDate);
+		return strRequestDate;
 	}
 	public void setRequestDate(Date requestDate) {
 		this.requestDate = requestDate;

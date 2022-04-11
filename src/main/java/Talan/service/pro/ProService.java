@@ -48,6 +48,12 @@ public class ProService {
         }
 		return result;
 	}
+
+	// PRO 확인
+	public int isProRegisted(String peopleId) {
+		int result = 0;
+		
+	}
 	
 	
 
