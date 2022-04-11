@@ -46,7 +46,7 @@ public class RequestService {
 			logger.info("========== 요청서 등록 완료 : {}", result);
 
 		} catch (Exception e) {
-			logger.error("[ERROR] registFeed() Fail : e : {}", e.getMessage());
+			logger.error("[ERROR] registRequest() Fail : e : {}", e.getMessage());
 			e.printStackTrace();
 			transactionManager_sample.rollback(status);
 		}
@@ -127,13 +127,13 @@ public class RequestService {
 
 		int result = 0;
 		try {
-			result = sqlSession.insert("request.setRequestClosed", param);
+			result = sqlSession.update("request.setRequestClosed", param);
 
 			transactionManager_sample.commit(status);
 			logger.info("========== 요청서 마감 완료 : {}", result);
 
 		} catch (Exception e) {
-			logger.error("[ERROR] registFeed() Fail : e : {}", e.getMessage());
+			logger.error("[ERROR] closedRequest() Fail : e : {}", e.getMessage());
 			e.printStackTrace();
 			transactionManager_sample.rollback(status);
 		}

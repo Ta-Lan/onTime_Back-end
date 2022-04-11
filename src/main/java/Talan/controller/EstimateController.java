@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import Talan.DTO.RequestDTO;
-import Talan.service.request.RequestService;
+import Talan.DTO.EstimateDTO;
+import Talan.service.estimate.EstimateService;
 import kr.msp.constant.Const;
 
 @Controller
-public class RequestController {
+public class EstimateController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -33,10 +33,10 @@ public class RequestController {
 	private SqlSession sqlSession;
 
 	@Autowired(required = true)
-	private RequestService service;
+	private EstimateService service;
 
 	// 요청서 등록
-	@RequestMapping(method = RequestMethod.POST, value = "/api/request/regist")
+	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/regist")
 	public ModelAndView registRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -52,11 +52,11 @@ public class RequestController {
 		if (session.getAttribute("user") != null) {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
-			reqBodyMap.put("peopleId", user.get("loginId"));
+			reqBodyMap.put("proId", user.get("loginId"));
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-			int result = service.registRequest(reqBodyMap);
+			int result = service.registEstimate(reqBodyMap);
 
 			if (result > 0) {
 				responseBodyMap.put("rsltCode", "0000");
@@ -77,9 +77,9 @@ public class RequestController {
 		return mv;
 	}
 
-	// 요청서 전체 조회
-	@RequestMapping(method = RequestMethod.POST, value = "/api/request/list")
-	public ModelAndView requestList(HttpServletRequest request, HttpServletResponse response) {
+	// 견적서 리스트
+	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/list")
+	public ModelAndView estimateList(HttpServletRequest request, HttpServletResponse response) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -94,15 +94,11 @@ public class RequestController {
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		List<Object> list = service.requestList(reqBodyMap);
-
-		Map<String, Object> lastRequest = new HashMap<String, Object>();
-		lastRequest = (Map<String, Object>) list.get(Integer.parseInt(reqBodyMap.get("cnt").toString()) - 1);
+		List<Object> list = service.estimateList(reqBodyMap);
 
 		if (!StringUtils.isEmpty(list)) {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
-			responseBodyMap.put("lastRequestNumber", lastRequest.get("requestNumber"));
 			responseBodyMap.put("list", list);
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
@@ -116,9 +112,9 @@ public class RequestController {
 		return mv;
 	}
 
-	// 요청서 검색
-	@RequestMapping(method = RequestMethod.POST, value = "/api/request/listSearch")
-	public ModelAndView requestListSearch(HttpServletRequest request, HttpServletResponse response) {
+	// 견적서 상세 조회
+	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/detail")
+	public ModelAndView detailEstimate(HttpServletRequest request, HttpServletResponse response) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -133,16 +129,20 @@ public class RequestController {
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		List<Object> list = service.requestListSearch(reqBodyMap);
+		EstimateDTO estimateDTO = service.detailEstimate(reqBodyMap);
 
-		Map<String, Object> lastRequest = new HashMap<String, Object>();
-		lastRequest = (Map<String, Object>) list.get(Integer.parseInt(reqBodyMap.get("cnt").toString()) - 1);
-
-		if (!StringUtils.isEmpty(list)) {
+		if (!StringUtils.isEmpty(estimateDTO)) {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
-			responseBodyMap.put("lastRequestNumber", lastRequest.get("requestNumber"));
-			responseBodyMap.put("list", list);
+			responseBodyMap.put("estimateNumber", estimateDTO.getEstimateNumber());
+			responseBodyMap.put("proId", estimateDTO.getProId());
+			responseBodyMap.put("predictTime", estimateDTO.getPredictTime());
+			responseBodyMap.put("quotePrice", estimateDTO.getQuotePrice());
+			responseBodyMap.put("estimateTitle", estimateDTO.getEstimateTitle());
+			responseBodyMap.put("estimateContent", estimateDTO.getEstimateContent());
+			responseBodyMap.put("estimateRegisterDate", estimateDTO.getEstimateRegisterDate());
+			responseBodyMap.put("estimateStatus", estimateDTO.getEstimateStatus());
+			responseBodyMap.put("requestNumber", estimateDTO.getRequestNumber());
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
@@ -155,55 +155,9 @@ public class RequestController {
 		return mv;
 	}
 
-	// 요청서 상세 조회
-	@RequestMapping(method = RequestMethod.POST, value = "/api/request/detail")
-	public ModelAndView detailRequest(HttpServletRequest request, HttpServletResponse response) {
-
-		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
-		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
-		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
-
-		if (reqHeadMap == null) {
-			reqHeadMap = new HashMap<String, Object>();
-		}
-
-		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
-		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
-
-		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
-
-		RequestDTO requestDTO = service.detailReqeust(reqBodyMap);
-
-		if (!StringUtils.isEmpty(requestDTO)) {
-			responseBodyMap.put("rsltCode", "0000");
-			responseBodyMap.put("rsltMsg", "Success");
-			responseBodyMap.put("requestNumber", requestDTO.getRequestNumber());
-			responseBodyMap.put("peopleId", requestDTO.getPeopleId());
-			responseBodyMap.put("category", requestDTO.getCategory());
-			responseBodyMap.put("requestDate", requestDTO.getRequestDate());
-			responseBodyMap.put("requestTitle", requestDTO.getRequestTitle());
-			responseBodyMap.put("requestContent", requestDTO.getRequestContent());
-			responseBodyMap.put("preference", requestDTO.getPreference());
-			responseBodyMap.put("requestRegisterDate", requestDTO.getRequestRegisterDate());
-			responseBodyMap.put("requestStatus", requestDTO.getRequestStatus());
-			responseBodyMap.put("town", requestDTO.getTown());
-			responseBodyMap.put("district", requestDTO.getDistrict());
-			responseBodyMap.put("taskLevel", requestDTO.getTaskLevel());
-		} else {
-			responseBodyMap.put("rsltCode", "2003");
-			responseBodyMap.put("rsltMsg", "Data not found.");
-		}
-
-		ModelAndView mv = new ModelAndView("defaultJsonView");
-		mv.addObject(Const.HEAD, reqHeadMap);
-		mv.addObject(Const.BODY, responseBodyMap);
-
-		return mv;
-	}
-
-	// 요청서 마감
-	@RequestMapping(method = RequestMethod.POST, value = "/api/request/closed")
-	public ModelAndView closedRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+	// 견적서 매칭 
+	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/matched")
+	public ModelAndView matchedEstimate(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
 		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
@@ -220,7 +174,7 @@ public class RequestController {
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-			int result = service.closedRequest(reqBodyMap);
+			int result = service.matchedEstimate(reqBodyMap);
 
 			if (result > 0) {
 				responseBodyMap.put("rsltCode", "0000");
