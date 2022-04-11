@@ -1,6 +1,10 @@
 package Talan.DTO;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EstimateDTO {
 	private String estimateNumber;
@@ -12,6 +16,20 @@ public class EstimateDTO {
 	private Date estimateRegisterDate;
 	private Character estimateStatus;
 	private String requestNumber;
+	
+	public Map<String, Object> getEstimateList() {
+		Map<String, Object> estimate = new HashMap<String, Object>();
+		estimate.put("estimateNumber", getEstimateNumber());
+		estimate.put("proId", getProId());
+		estimate.put("predictTime", getPredictTime());
+		estimate.put("quotePrice", getQuotePrice());
+		estimate.put("estimateTitle", getEstimateTitle());
+		estimate.put("estimateContent", getEstimateContent());
+		estimate.put("estimateRegisterDate", getEstimateRegisterDate());
+		estimate.put("estimateStatus", getEstimateStatus());
+		estimate.put("requestNumber", getRequestNumber());
+		return estimate;
+	}
 	
 	public String getEstimateNumber() {
 		return estimateNumber;
@@ -49,8 +67,10 @@ public class EstimateDTO {
 	public void setEstimateContent(String estimateContent) {
 		this.estimateContent = estimateContent;
 	}
-	public Date getEstimateRegisterDate() {
-		return estimateRegisterDate;
+	public String getEstimateRegisterDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strEstimateRegisterDate = dateFormat.format(estimateRegisterDate);
+		return strEstimateRegisterDate;
 	}
 	public void setEstimateRegisterDate(Date estimateRegisterDate) {
 		this.estimateRegisterDate = estimateRegisterDate;

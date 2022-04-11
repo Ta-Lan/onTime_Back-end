@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="estimate">
+	
+	<sql id="setEstimateNumber" >
+		SELECT CONCAT('ESTIMATE',
+		NVL(MAX(SUBSTR(ESTIMATE_NUMBER,9)),100000)+ 1) FROM ESTIMATE
+	</sql>
+	
+	<insert id="registEstimate">
+		INSERT INTO ESTIMATE (ESTIMATE_NUMBER, PRO_ID, PREDICT_TIME, QUOTE_PRICE, ESTIMATE_TITLE, ESTIMATE_CONTENT, ESTIMATE_REGISTER_DATE, ESTIMATE_STATUS, REQUEST_NUMBER)
+		VALUES
+		( (<include refid="setEstimateNumber"/>), #{proId}, #{predictTime}, #{quotePrice}, #{estimateTitle}, #{estimateContent}, SYSDATE, 0, #{requestNumber} )
+	</insert>
+	
+	<select id="getEstimateList" parameterType="map" resultType="Talan.DTO.EstimateDTO">
+		SELECT * FROM ESTIMATE WHERE REQUEST_NUMBER = #{requestNumber}
+	</select>
+	
+	<update id="setEstimateMatched">
+		UPDATE ESTIMATE
+		SET ESTIMATE_STATUS = 1
+		WHERE ESTIMATE_NUMBER = #{estimateNumber}
+	</update>
+	
+	<select id="getEstimate" parameterType="map" resultType="Talan.DTO.EstimateDTO">
+		SELECT * FROM ESTIMATE WHERE ESTIMATE_NUMBER = #{estimateNumber}
+	</select>
+	
+</mapper>
