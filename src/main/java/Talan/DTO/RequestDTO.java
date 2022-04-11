@@ -3,6 +3,8 @@ package Talan.DTO;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestDTO {
 	private String requestNumber;
@@ -17,6 +19,23 @@ public class RequestDTO {
 	private String town;
 	private String district;
 	private Integer taskLevel;
+	
+	public Map<String, Object> getRequestList() {
+		Map<String, Object> request = new HashMap<String, Object>();
+		request.put("requestNumber", requestNumber);
+		request.put("peopleId", peopleId);
+		request.put("category", category);
+		request.put("requestDate", getRequestDate());
+		request.put("requestTitle", requestTitle);
+		request.put("requestContent", requestContent);
+		request.put("preference", preference);
+		request.put("requestRegisterDate", getRequestRegisterDate());
+		request.put("requestStatus", requestStatus);
+		request.put("town", town);
+		request.put("district", district);
+		request.put("taskLevel", taskLevel);
+		return request;
+	}
 	
 	public String getRequestNumber() {
 		return requestNumber;
@@ -62,8 +81,10 @@ public class RequestDTO {
 	public void setPreference(String preference) {
 		this.preference = preference;
 	}
-	public Date getRequestRegisterDate() {
-		return requestRegisterDate;
+	public String getRequestRegisterDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strRequestRegisterDate = dateFormat.format(requestRegisterDate);
+		return strRequestRegisterDate;
 	}
 	public void setRequestRegisterDate(Date requestRegisterDate) {
 		this.requestRegisterDate = requestRegisterDate;
@@ -92,4 +113,5 @@ public class RequestDTO {
 	public void setTaskLevel(Integer taskLevel) {
 		this.taskLevel = taskLevel;
 	}
+
 }

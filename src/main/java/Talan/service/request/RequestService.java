@@ -1,5 +1,7 @@
 package Talan.service.request;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import Talan.DTO.RequestDTO;
 
 @Service
 public class RequestService {
@@ -46,6 +50,64 @@ public class RequestService {
 			transactionManager_sample.rollback(status);
 		}
 		return result;
+	}
+
+	// 요청서 리스트
+	public List<Object> requestList(Map<String, Object> param) {
+		List<RequestDTO> request = new ArrayList<RequestDTO>();
+
+		if (param.get("lastRequestNumber").equals("0")) {
+			param.replace("lastRequestNumber", "0", sqlSession.selectOne("request.getLastRequestNumber"));
+		} else {
+			String strlastRequestNumber = param.get("lastRequestNumber").toString();
+			int lastRequestNumber = Integer.parseInt(strlastRequestNumber.substring(7)) - 1;
+			param.replace("lastRequestNumber", "REQUEST" + lastRequestNumber);
+		}
+
+		int requestCnt = sqlSession.selectOne("request.getRequestCnt");
+		if ((Integer.parseInt(param.get("cnt").toString()) > requestCnt)
+				|| Integer.parseInt(param.get("cnt").toString()) == 0) {
+			param.replace("cnt", requestCnt);
+		}
+
+		request = sqlSession.selectList("request.getRequestList", param);
+
+		int cnt = Integer.parseInt(param.get("cnt").toString()) - 1;
+
+		List<Object> list = new ArrayList<Object>();
+		for (int i = 0; i <= cnt; i++) {
+			list.add(request.get(i).getRequestList());
+		}
+		return list;
+	}
+
+	// 요청서 검색
+	public List<Object> requestListSearch(Map<String, Object> param) {
+		List<RequestDTO> request = new ArrayList<RequestDTO>();
+
+		if (param.get("lastRequestNumber").equals("0")) {
+			param.replace("lastRequestNumber", "0", sqlSession.selectOne("request.getSearchLastRequestNumber", param));
+		} else {
+			String strlastRequestNumber = param.get("lastRequestNumber").toString();
+			int lastRequestNumber = Integer.parseInt(strlastRequestNumber.substring(7)) - 1;
+			param.replace("lastRequestNumber", "REQUEST" + lastRequestNumber);
+		}
+
+		int requestCnt = sqlSession.selectOne("request.getRequestSearchCnt", param);
+		if ((Integer.parseInt(param.get("cnt").toString()) > requestCnt)
+				|| Integer.parseInt(param.get("cnt").toString()) == 0) {
+			param.replace("cnt", requestCnt);
+		}
+
+		request = sqlSession.selectList("request.getRequestSearchList", param);
+
+		int cnt = Integer.parseInt(param.get("cnt").toString()) - 1;
+
+		List<Object> list = new ArrayList<Object>();
+		for (int i = 0; i <= cnt; i++) {
+			list.add(request.get(i).getRequestList());
+		}
+		return list;
 	}
 
 }

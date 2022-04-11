@@ -8,9 +8,8 @@
 	<select id="getPeopleInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">
 		SELECT *
 		FROM   PEOPLE
-		<if test="loginId != null and loginId != '' ">
-			WHERE PEOPLE_ID = #{loginId}
-		</if>
+		WHERE PEOPLE_ID = #{peopleId}
+		
 	</select>
 	
 	<select id="getNickname" parameterType="String" resultType="String">

@@ -11,8 +11,8 @@
 		( #{proId}, #{kindScore}, #{category}, #{license} )
 	</insert>
 	
-	<select id="isProRegisted">
-		SELECT PRO_ID FROM WHERE PRO_ID = #{peopleId}
+	<select id="isProRegisted" resultType="Integer">
+		SELECT COUNT(*) AS cnt FROM PRO WHERE PRO_ID = #{peopleId}
 	</select>
 	
 </mapper>

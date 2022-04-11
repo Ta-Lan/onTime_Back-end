@@ -16,4 +16,93 @@
 		( (<include refid="setRequestNumber"/>), #{peopleId}, #{category}, #{requestDate}, #{requestTitle}, #{requestContent}, #{preference}, SYSDATE, 0, #{town}, #{district}, #{taskLevel} )
 	</insert>
 	
+	<select id="getLastRequestNumber" resultType="String">
+		SELECT REQUEST_NUMBER FROM (SELECT REQUEST_NUMBER, ROWNUM FROM REQUEST ORDER BY REQUEST_NUMBER DESC) WHERE ROWNUM = 1
+	</select>
+	
+	<select id="getSearchLastRequestNumber" parameterType="map" resultType="String">
+		SELECT REQUEST_NUMBER 
+		FROM (SELECT REQUEST_NUMBER, ROWNUM, TOWN, DISTRICT, CATEGORY FROM REQUEST ORDER BY REQUEST_NUMBER DESC)
+		<if test="town != '전체' and district != '전체' and category != '전체'">
+        WHERE ROWNUM = 1 AND TOWN = #{town} AND DISTRICT = #{district} AND CATEGORY = #{category}
+        </if>
+        <if test="town != '전체' and district != '전체' and category == '전체'">
+        WHERE ROWNUM = 1 AND TOWN = #{town} AND DISTRICT = #{district}
+        </if>
+        <if test="town == '전체' and district == '전체' and category != '전체'">
+        WHERE ROWNUM = 1 AND CATEGORY = #{category}
+        </if>
+	</select>
+
+	<select id="getRequestList" parameterType="map" resultType="Talan.DTO.RequestDTO">
+		SELECT REQUEST_NUMBER, PEOPLE_ID, CATEGORY, REQUEST_DATE, REQUEST_TITLE, REQUEST_CONTENT, PREFERENCE, REQUEST_REGISTER_DATE, REQUEST_STATUS,
+        TOWN, DISTRICT, TASK_LEVEL
+		FROM
+		(
+		SELECT ROWNUM, REQUEST_NUMBER, PEOPLE_ID, CATEGORY, REQUEST_DATE, REQUEST_TITLE, REQUEST_CONTENT, PREFERENCE, REQUEST_REGISTER_DATE, REQUEST_STATUS,
+        TOWN, DISTRICT, TASK_LEVEL
+		FROM
+		(
+		SELECT *
+		FROM REQUEST
+		ORDER BY REQUEST_NUMBER DESC
+		)
+		<![CDATA[
+		WHERE REQUEST_NUMBER <= #{lastRequestNumber}
+		)
+		WHERE ROWNUM <= #{cnt}
+		]]>
+	</select>
+	
+	<select id="getRequestSearchList" parameterType="map" resultType="Talan.DTO.RequestDTO">
+		SELECT REQUEST_NUMBER, PEOPLE_ID, CATEGORY, REQUEST_DATE, REQUEST_TITLE, REQUEST_CONTENT, PREFERENCE, REQUEST_REGISTER_DATE, REQUEST_STATUS,
+        TOWN, DISTRICT, TASK_LEVEL
+		FROM
+		(
+		SELECT REQUEST_NUMBER, PEOPLE_ID, CATEGORY, REQUEST_DATE, REQUEST_TITLE, REQUEST_CONTENT, PREFERENCE, REQUEST_REGISTER_DATE, REQUEST_STATUS,
+        TOWN, DISTRICT, TASK_LEVEL
+		FROM
+		(
+		SELECT ROWNUM, REQUEST_NUMBER, PEOPLE_ID, CATEGORY, REQUEST_DATE, REQUEST_TITLE, REQUEST_CONTENT, PREFERENCE, REQUEST_REGISTER_DATE, REQUEST_STATUS,
+        TOWN, DISTRICT, TASK_LEVEL
+		FROM
+		(
+		SELECT *
+		FROM REQUEST
+		ORDER BY REQUEST_NUMBER DESC
+		)
+		<if test="town != '전체' and district != '전체' and category != '전체'">
+        WHERE TOWN = #{town} AND DISTRICT = #{district} AND CATEGORY = #{category}
+        </if>
+        <if test="town != '전체' and district != '전체' and category == '전체'">
+        WHERE TOWN = #{town} AND DISTRICT = #{district}
+        </if>
+        <if test="town == '전체' and district == '전체' and category != '전체'">
+        WHERE CATEGORY = #{category}
+        </if>
+		)
+		<![CDATA[
+		WHERE REQUEST_NUMBER <= #{lastRequestNumber}
+		)
+		WHERE ROWNUM <= #{cnt}
+		]]>
+	</select>
+	
+	<select id="getRequestCnt" resultType="Integer">
+		SELECT COUNT(*) AS cnt FROM REQUEST
+	</select>
+	
+	<select id="getRequestSearchCnt" parameterType="map" resultType="Integer">
+		SELECT COUNT(*) AS cnt FROM REQUEST 
+		<if test="town != '전체' and district != '전체' and category != '전체'">
+        WHERE TOWN = #{town} AND DISTRICT = #{district} AND CATEGORY = #{category}
+        </if>
+        <if test="town != '전체' and district != '전체' and category == '전체'">
+        WHERE TOWN = #{town} AND DISTRICT = #{district}
+        </if>
+        <if test="town == '전체' and district == '전체' and category != '전체'">
+        WHERE CATEGORY = #{category}
+        </if>
+	</select>
+	
 </mapper>
