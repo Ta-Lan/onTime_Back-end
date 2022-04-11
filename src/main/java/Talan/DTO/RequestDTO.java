@@ -56,7 +56,7 @@ public class RequestDTO {
 		this.category = category;
 	}
 	public String getRequestDate() {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.");
 		String strRequestDate = dateFormat.format(requestDate);
 		return strRequestDate;
 	}
