@@ -105,7 +105,7 @@ public class FeedController {
 		if (session.getAttribute("user") != null) {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
-			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user);
+			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user.get("loginId"));
 
 			reqBodyMap.put("proId", user.get("loginId"));
 			reqBodyMap.put("feedWriterNickname", peopleDTO.getNickname());

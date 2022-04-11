@@ -15,6 +15,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import Talan.DTO.FeedDTO;
 import Talan.DTO.RequestDTO;
 
 @Service
@@ -109,5 +110,36 @@ public class RequestService {
 		}
 		return list;
 	}
+	
+	// 요청서 상세 조회
+	public RequestDTO detailReqeust(Map<String, Object> param) {
+		RequestDTO request = sqlSession.selectOne("request.getRequest", param);
+		return request;
+	}
+	
+
+	// 요청서 마감
+	public int closedRequest(Map<String, Object> param) {
+		// 트랜잭션 구현
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager_sample.getTransaction(def);
+
+		int result = 0;
+		try {
+			result = sqlSession.insert("request.setRequestClosed", param);
+
+			transactionManager_sample.commit(status);
+			logger.info("========== 요청서 마감 완료 : {}", result);
+
+		} catch (Exception e) {
+			logger.error("[ERROR] registFeed() Fail : e : {}", e.getMessage());
+			e.printStackTrace();
+			transactionManager_sample.rollback(status);
+		}
+		return result;
+	}
+
+
 
 }

@@ -50,8 +50,7 @@
 		PRO_ID = #{proId}
 	</update>
 
-	<select id="getFeed" parameterType="map"
-		resultType="Talan.DTO.FeedDTO">
+	<select id="getFeed" parameterType="map" resultType="Talan.DTO.FeedDTO">
 		SELECT * FROM FEED WHERE FEED_NUMBER = #{feedNumber}
 	</select>
 
@@ -101,7 +100,7 @@
 		SELECT *
 		FROM FEED 
 		WHERE PRO_ID = #{proId}
-		ORDER BY FEED_NUMBER asc
+		ORDER BY FEED_NUMBER desc
 	</select>
 	
 	<select id="getFeedProCnt" resultType="Integer">

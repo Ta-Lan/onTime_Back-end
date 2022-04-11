@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import Talan.DTO.PeopleDTO;
+import Talan.DTO.RequestDTO;
 import Talan.service.request.RequestService;
 import kr.msp.constant.Const;
 
@@ -53,13 +53,6 @@ public class RequestController {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
 			reqBodyMap.put("peopleId", user.get("loginId"));
-
-//	            PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user);
-//	            
-//	            String address[] = peopleDTO.getAddress().split("`");
-//	            
-//	            reqBodyMap.put("town", address[0]);
-//	            reqBodyMap.put("district", address[1]);
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
@@ -122,7 +115,7 @@ public class RequestController {
 
 		return mv;
 	}
-	
+
 	// 요청서 검색
 	@RequestMapping(method = RequestMethod.POST, value = "/api/request/listSearch")
 	public ModelAndView requestListSearch(HttpServletRequest request, HttpServletResponse response) {
@@ -153,6 +146,92 @@ public class RequestController {
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
+	// 요청서 상세 조회
+	@RequestMapping(method = RequestMethod.POST, value = "/api/request/detail")
+	public ModelAndView detailFeed(HttpServletRequest request, HttpServletResponse response) {
+
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+		RequestDTO requestDTO = service.detailReqeust(reqBodyMap);
+
+		if (!StringUtils.isEmpty(requestDTO)) {
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+			responseBodyMap.put("requestNumber", requestDTO.getRequestNumber());
+			responseBodyMap.put("peopleId", requestDTO.getPeopleId());
+			responseBodyMap.put("category", requestDTO.getCategory());
+			responseBodyMap.put("requestDate", requestDTO.getRequestDate());
+			responseBodyMap.put("requestTitle", requestDTO.getRequestTitle());
+			responseBodyMap.put("requestContent", requestDTO.getRequestContent());
+			responseBodyMap.put("preference", requestDTO.getPreference());
+			responseBodyMap.put("requestRegisterDate", requestDTO.getRequestRegisterDate());
+			responseBodyMap.put("requestStatus", requestDTO.getRequestStatus());
+			responseBodyMap.put("town", requestDTO.getTown());
+			responseBodyMap.put("district", requestDTO.getDistrict());
+			responseBodyMap.put("taskLevel", requestDTO.getTaskLevel());
+		} else {
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
+	// 요청서 마감
+	@RequestMapping(method = RequestMethod.POST, value = "/api/request/closed")
+	public ModelAndView closedRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		if (session.getAttribute("user") != null) {
+			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+			int result = service.closedRequest(reqBodyMap);
+
+			if (result > 0) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
+		} else if (session.getAttribute("user") == null) {
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login required.");
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");

@@ -105,4 +105,14 @@
         </if>
 	</select>
 	
+	<update id="setRequestClosed">
+		UPDATE REQUEST
+		SET REQUEST_STATUS = 1
+		WHERE REQUEST_NUMBER = #{requestNumber}
+	</update>
+	
+	<select id="getRequest" parameterType="map" resultType="Talan.DTO.RequestDTO">
+		SELECT * FROM REQUEST WHERE REQUEST_NUMBER = #{requestNumber}
+	</select>
+	
 </mapper>
