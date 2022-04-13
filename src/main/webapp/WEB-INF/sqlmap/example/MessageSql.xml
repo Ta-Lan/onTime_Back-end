@@ -5,77 +5,57 @@
 
 <mapper namespace="message">
     <sql id="getMaxNum">
-		SELECT CONCAT('MESSAGE',
-		NVL(MAX(SUBSTR(MESSAGE_NUMBER,8)),100000)+ 1) FROM MESSAGE
+		SELECT CONCAT('MESSAGES',
+		NVL(MAX(SUBSTR(MESSAGE_NUMBER,9)),100000)+ 1) FROM MESSAGE
     </sql>
+    
+    <sql id="setEstimateMessageNumber">
+		SELECT CONCAT('ESTIMATE', NVL(MAX(SUBSTR(MESSAGE_NUMBER,9)),100000)+ 1) FROM MESSAGE
+    </sql>
+    
+    <sql id="setChatNumber">
+    	SELECT CONCAT('CHAT',
+		NVL(MAX(SUBSTR(CHAT_NUMBER,5)),100000)+ 1) FROM MESSAGE
+    </sql>
+    
     <select id="getMessageInfo" parameterType="map" resultType="Talan.DTO.MessageDTO">
-        select MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT, MESSAGE_TIME
+        select *
         from MESSAGE
-        <!--        <if test="messageSender != null and messageReceiver " -->
-        where MESSAGE_SENDER = #{messageSender} and MESSAGE_RECEIVER = #{messageReceiver}
-        or MESSAGE_SENDER = #{messageReceiver} and MESSAGE_RECEIVER = #{messageSender}
+        where CHAT_NUMBER = #{chatNumber}
     </select>
+    
     <insert id="insertMessage" parameterType="map">
-        insert into MESSAGE (MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT)
-        values ((<include refid="getMaxNum"/>),#{messageSender}, #{messageReceiver}, #{messageContent})
+        insert into MESSAGE (MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT, CHAT_NUMBER)
+        values ((<include refid="getMaxNum"/>),#{messageSender}, #{messageReceiver}, #{messageContent}, #{chatNumber})
     </insert>
-    <!--	<select id="getPeopleInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
-    <!--		SELECT *-->
-    <!--		FROM   PEOPLE-->
-    <!--		<if test="peopleId != null and peopleId != '' ">-->
-    <!--			WHERE PEOPLE_ID = #{peopleId}-->
-    <!--		</if>-->
-    <!--	</select>-->
-    <!--	<update id="updatePeople">-->
-    <!--		UPDATE PEOPLE-->
-    <!--		SET	NAME = #{name}, BIRTH = #{birth}, NICKNAME = #{nickname}, ADDRESS = #{address}, PHONE = #{phone}, INTRO = #{intro}-->
-    <!--		WHERE PEOPLE_ID = #{peopleId}-->
-    <!--	</update>-->
-    <!--	-->
-    <!--	<delete id="deletePeople">-->
-    <!--		DELETE FROM PEOPLE-->
-    <!--		WHERE  PEOPLE_ID = #{peopleId}-->
-    <!--	</delete>-->
-    <!--	-->
-    <!--	<select id="loginPeople" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
-    <!--		SELECT PEOPLE_ID, PASSWORD-->
-    <!--		FROM PEOPLE-->
-    <!--		WHERE PEOPLE_ID = #{peopleId}-->
-    <!--	</select>-->
-    <!--	-->
-    <!--	<select id="findId" parameterType="map" resultType="string">-->
-    <!--		SELECT PEOPLE_ID-->
-    <!--		FROM PEOPLE-->
-    <!--		WHERE NAME = #{name} and EMAIL = #{email}-->
-    <!--	</select>-->
+    
+    <insert id="insertNewMessage" parameterType="map">
+        insert into MESSAGE (MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT, CHAT_NUMBER)
+        values ((<include refid="getMaxNum"/>), #{messageSender}, #{messageReceiver}, #{messageContent}, (<include refid="setChatNumber"/>))
+    </insert>
+    
+    <insert id="insertEstimateMessage" parameterType="map">
+        insert into MESSAGE (MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT, CHAT_NUMBER)
+        values ((<include refid="setEstimateMessageNumber"/>),#{messageSender}, #{messageReceiver}, #{messageContent}, #{chatNumber})
+    </insert>
+    
+    <insert id="insertNewEstimateMessage" parameterType="map">
+        insert into MESSAGE (MESSAGE_NUMBER, MESSAGE_SENDER, MESSAGE_RECEIVER, MESSAGE_CONTENT, CHAT_NUMBER)
+        values ((<include refid="setEstimateMessageNumber"/>), #{messageSender}, #{messageReceiver}, #{messageContent}, (<include refid="setChatNumber"/>))
+    </insert>
+    
+    <select id="getChatNumber" parameterType="map" resultType = "String">
+    	select chat_number
+    	from message 
+    	where message_sender = #{messageSender} and message_receiver = #{messageReceiver} OR message_sender = #{messageReceiver} and message_receiver = #{messageSender} group by chat_number
+    </select>
+    
+    <select id="getChatList" parameterType="map" resultType="Talan.DTO.MessageDTO">
+     	select * from message 
+     	where message_time in 
+     	(select MAX(MESSAGE_TIME) from message 
+     	where message_sender = #{loginId} or message_receiver = #{loginId}
+     	group by chat_number) order by message_time desc
+    </select>
 
-    <!--	<select id="isPeople" parameterType="map" resultType="Talan.DTO.PeopleDTO">-->
-    <!--		SELECT *-->
-    <!--		FROM PEOPLE-->
-    <!--		WHERE PEOPLE_ID = #{peopleId} and NAME = #{name} and EMAIL = #{email}-->
-    <!--	</select>-->
-    <!--	-->
-    <!--	<update id="changePWD">-->
-    <!--		UPDATE PEOPLE-->
-    <!--		SET PASSWORD = #{password}-->
-    <!--		WHERE PEOPLE_ID = #{peopleId}-->
-    <!--	</update>-->
-    <!--	-->
-    <!--	<select id="duplicatePeople1" resultType="Talan.DTO.PeopleDTO">-->
-    <!--		SELECT *-->
-    <!--		FROM PEOPLE-->
-    <!--		WHERE LOGIN_ID = #{loginId}-->
-    <!--	</select>-->
-    <!--	-->
-    <!--	<select id="duplicatePeople2" resultType="Talan.DTO.PeopleDTO">-->
-    <!--		SELECT *-->
-    <!--		FROM PEOPLE-->
-    <!--		WHERE NICKNAME = #{nickname}-->
-    <!--	</select>-->
-    <!--	-->
-    <!--	<select id="duplicatePeople3" resultType="Talan.DTO.PeopleDTO">-->
-    <!--		SELECT *-->
-    <!--		FROM PEOPLE-->
-    <!--		WHERE EMAIL = #{email}-->
-    <!--	</select>-->
 </mapper>

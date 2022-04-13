@@ -49,8 +49,9 @@ public class RequestController {
 		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
-		if (session.getAttribute("user") != null) {
-			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+		
+		if (user != null) {
 
 			reqBodyMap.put("peopleId", user.get("loginId"));
 

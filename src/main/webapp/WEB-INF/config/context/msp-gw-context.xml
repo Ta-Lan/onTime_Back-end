@@ -32,6 +32,11 @@
     <!--제우스일 경우 주석 해제 하고 다음줄 주석 처리-->
     <!--<mvc:default-servlet-handler default-servlet-name="WorkerServlet"/>-->
 	<mvc:default-servlet-handler/>
+	
+	<beans:bean id="bCrypt"
+          class="org.mindrot.bcrypt.BCrypt">
+        <beans:qualifier value="bCrypt"/>
+    </beans:bean>
 
     <beans:bean id="uracleSecureAuth" class="kr.msp.base.security.UracleSecureAuth" >     <!--uralce SecureAuth decirpt-->
         <beans:qualifier value="uracleSecureAuth"/>

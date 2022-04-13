@@ -35,7 +35,7 @@ public class EstimateController {
 	@Autowired(required = true)
 	private EstimateService service;
 
-	// 요청서 등록
+	// 견적 등록
 	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/regist")
 	public ModelAndView registRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);

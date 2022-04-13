@@ -16,7 +16,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import Talan.DTO.EstimateDTO;
-import Talan.DTO.RequestDTO;
+import Talan.service.MessageService;
 
 @Service
 public class EstimateService {
@@ -30,6 +30,9 @@ public class EstimateService {
 	@Autowired(required = true)
 	@Qualifier("transactionManager_sample")
 	private DataSourceTransactionManager transactionManager_sample;
+	
+	@Autowired
+	private MessageService service;
 
 	// 견적서 등록
 	public int registEstimate(Map<String, Object> param) {
@@ -41,7 +44,9 @@ public class EstimateService {
 		int result = 0;
 		try {
 			result = sqlSession.insert("estimate.registEstimate", param);
-
+			if (result == 1) {
+				service.insertEstimateMessage(param);
+			}
 			transactionManager_sample.commit(status);
 			logger.info("========== 견적서 등록 완료 : {}", result);
 

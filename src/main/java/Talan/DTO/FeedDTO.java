@@ -26,6 +26,9 @@ public class FeedDTO {
 		feed.put("feedTitle", feedTitle);
 		feed.put("feedContent", feedContent);
 		feed.put("feedWriterNickname", feedWriterNickname);
+		feed.put("storeFileName", getStoreFileName());
+		feed.put("originFileName", getOriginFileName());
+		feed.put("filePath", getFilePath());
 		return feed;
 	}
 
@@ -73,18 +76,18 @@ public class FeedDTO {
 		return storeFileName;
 	}
 	public void setStoreFileName(String storeFileName) {
-		storeFileName = this.storeFileName;
+		this.storeFileName = storeFileName;
 	}
 	public String getOriginFileName() {
 		return originFileName;
 	}
 	public void setOriginFileName(String originFileName) {
-		originFileName = this.originFileName;
+		this.originFileName = originFileName;
 	}
 	public String getFilePath() {
 		return filePath;
 	}
 	public void setFilePath(String filePath) {
-		filePath = this.filePath;
+		this.filePath = filePath;
 	}
 }

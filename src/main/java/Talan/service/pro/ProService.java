@@ -13,6 +13,8 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import Talan.DTO.ProDTO;
+
 @Service
 public class ProService {
 	
@@ -53,6 +55,12 @@ public class ProService {
 	public int isProRegisted(String peopleId) {
 		int result = sqlSession.selectOne("pro.isProRegisted", peopleId);
 		return result;
+	}
+
+	public ProDTO getProInfo(Map<String, Object> param) {
+		ProDTO info = sqlSession.selectOne("pro.getProInfo",param);
+		
+		return info;
 	}
 	
 	

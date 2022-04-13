@@ -1,15 +1,29 @@
 package Talan.DTO;
 
-import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MessageDTO {
     private String messageNumber;
+    private String chatNumber;
     private String messageSender;
     private String messageReceiver;
     private String messageContent;
     private Date messageTime;
+    
+    public Map<String, String> getChatList() {
+		Map<String, String> chat = new HashMap<String, String>();
+		chat.put("chatNumber", chatNumber);
+		chat.put("messageNumber", messageNumber);
+		chat.put("messageSender", messageSender);
+		chat.put("messageReceiver", messageReceiver);
+		chat.put("messageContent", messageContent);
+		chat.put("messageTime", getMessageTime());
+		return chat;
+	}
 
     public String getMessageNumber() {
         return messageNumber;
@@ -17,6 +31,14 @@ public class MessageDTO {
 
     public void setMessageNumber(String messageNumber) {
         this.messageNumber = messageNumber;
+    }
+    
+    public String getChatNumber() {
+        return chatNumber;
+    }
+
+    public void setChatNumber(String chatNumber) {
+        this.chatNumber = chatNumber;
     }
 
     public String getMessageSender() {
@@ -45,8 +67,8 @@ public class MessageDTO {
 
     public String getMessageTime() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
-        String strFeedRegisterDate = dateFormat.format(messageTime);
-        return strFeedRegisterDate;
+        String strMessageTime = dateFormat.format(messageTime);
+        return strMessageTime;
 
     }
 

@@ -1,6 +1,8 @@
 package Talan.controller;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +40,7 @@ public class PeopleController {
 
 	@Autowired(required = true)
 	private PeopleService service;
+
 	@Autowired(required = true)
 	private ProService proService;
 	
@@ -60,6 +63,13 @@ public class PeopleController {
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 		PeopleDTO info = service.getPeopleInfo(reqBodyMap);
+		
+		int proRegisted = proService.isProRegisted(info.getPeopleId());
+		boolean isPro = false;
+
+		if (proRegisted == 1) {
+			isPro = true;
+		}
 
 		if (!StringUtils.isEmpty(info)) {
 			responseBodyMap.put("rsltCode", "0000");
@@ -68,12 +78,15 @@ public class PeopleController {
 			responseBodyMap.put("nickname", info.getNickname());
 			responseBodyMap.put("address", info.getAddress());
 			responseBodyMap.put("phone", info.getPhone());
+			responseBodyMap.put("birth", info.getBirth());
+			responseBodyMap.put("gender", info.getGender());
 			responseBodyMap.put("intro", info.getIntro());
 			responseBodyMap.put("email", info.getEmail());
 			responseBodyMap.put("account", info.getAccount());
 			responseBodyMap.put("originImageName", info.getOriginImageName());
 			responseBodyMap.put("storeImageName", info.getStoreImageName());
 			responseBodyMap.put("imagePath", info.getImagePath());
+			responseBodyMap.put("isProRegisted", isPro);
 
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
@@ -149,12 +162,22 @@ public class PeopleController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
 		//////////////////////////// IMAGE UPLOAD////////////////////////////
+		
+		InetAddress addr = null;
+		try {
+			addr = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		String ip = addr.getHostAddress();
+		String http = "http://";
+		String port = ":8888";
+		String server = http + ip + port;
 
-		String fileDir = "/image/profileImage";
+		String fileDir = "/image/profileImage/";
 		String filePath = request.getServletContext().getRealPath(fileDir);
 		System.out.println(filePath);
 		MultipartFile image = request.getFile("image");
-
 		String originalFile = image.getOriginalFilename();
 
 		// .png
@@ -165,7 +188,7 @@ public class PeopleController {
 
 		String storeFileName = storeName + extension;
 
-		File file = new File(filePath + "/" + storeFileName);
+		File file = new File(filePath + storeFileName);
 		try {
 			image.transferTo(file); // 파일을 저장
 		} catch (Exception e) {
@@ -174,7 +197,7 @@ public class PeopleController {
 
 		reqBodyMap.put("storeImageName", storeFileName);
 		reqBodyMap.put("originImageName", originalFile);
-		reqBodyMap.put("imagePath", filePath);
+		reqBodyMap.put("imagePath", server + fileDir);
 
 		//////////////////////////// IMAGE UPLOAD////////////////////////////
 
@@ -199,7 +222,7 @@ public class PeopleController {
 
 	// 회원정보수정
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/update")
-	public ModelAndView updatePeople(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView updatePeople(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -211,6 +234,12 @@ public class PeopleController {
 
 		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+		user = (Map<String, Object>) session.getAttribute("user");
+
+		reqBodyMap.put("peopleId", user.get("loginId"));
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
@@ -229,6 +258,53 @@ public class PeopleController {
 		mv.addObject(Const.BODY, responseBodyMap);
 
 		return mv;
+	}
+
+	// 내 소개 수정
+	@RequestMapping(method = RequestMethod.POST, value = "/api/people/updateIntro")
+	public ModelAndView updateIntro(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+		user = (Map<String, Object>) session.getAttribute("user");
+
+		if (user != null) {
+
+			reqBodyMap.put("peopleId", user.get("loginId").toString());
+
+			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+			int result = service.updateIntro(reqBodyMap);
+
+			if (result == 1) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+			} else {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+				responseBodyMap.put("existYn", "N");
+			}
+		} else {
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login required.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+
 	}
 
 	// 회원탈퇴
@@ -283,11 +359,11 @@ public class PeopleController {
 		Map<String, String> user = new HashMap<String, String>();
 
 		PeopleDTO DTO = sqlSession.selectOne("people.getSession", reqBodyMap);
-		
+
 		int result = service.loginPeople(reqBodyMap);
 		int proRegisted = proService.isProRegisted(DTO.getPeopleId());
 		boolean isPro = false;
-		
+
 		if (proRegisted == 1) {
 			isPro = true;
 		}
@@ -300,8 +376,7 @@ public class PeopleController {
 			session.setAttribute("user", user);
 			responseBodyMap.put("session", DTO);
 			responseBodyMap.put("isProRegisted", isPro);
-			
-			
+
 		} else if (result == -1) {
 			responseBodyMap.put("rsltCode", "2001");
 			responseBodyMap.put("rsltMsg", "ID or PWD not correct");
@@ -317,42 +392,39 @@ public class PeopleController {
 		return mv;
 	}
 
-//	@RequestMapping( method = RequestMethod.POST, value = "/api/people/loginout" )
-//	public ModelAndView logoutPeople ( HttpServletRequest request, HttpServletResponse response, HttpSession session ) {
-//		Map<String,Object> reqHeadMap =  (Map<String,Object>)request.getAttribute(Const.HEAD);
-//        Map<String,Object> reqBodyMap =  (Map<String,Object>)request.getAttribute(Const.BODY);
-//        Map<String, Object> responseBodyMap= new HashMap<String, Object>();
-//        
-//        if(reqHeadMap==null){
-//            reqHeadMap = new HashMap<String, Object>();
-//        }
-//        
-//        reqHeadMap.put(Const.RESULT_CODE, Const.OK);
-//        reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
-//		
-//        logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
-//        
-//        peopleDTO DTO = new peopleDTO();
-//        
-//        int result = service.logoutpeople( reqBodyMap );
-//        
-//        if( result > 1 ) {
-//        	responseBodyMap.put("rsltCode", "0000");
-//            responseBodyMap.put("rsltMsg", "Success");
-//            session.removeAttribute("DTO");
-//            session.invalidate();
-//        }
-//        else {
-//        	responseBodyMap.put("rsltCode", "2003");
-//            responseBodyMap.put("rsltMsg", "Data not found.");
-//        }
-//		
-//        ModelAndView mv = new ModelAndView("defaultJsonView");
-//        mv.addObject(Const.HEAD,reqHeadMap);
-//        mv.addObject(Const.BODY,responseBodyMap);
-//
-//        return mv;
-//	}
+	// 로그아웃
+	@RequestMapping(method = RequestMethod.POST, value = "/api/people/loginout")
+	public ModelAndView logoutPeople(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+		if (user != null) {
+			responseBodyMap.put("logout", user.get("loginId").toString() + ", 로그아웃 성공");
+			session.removeAttribute("user");
+			session.invalidate();
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+		} else {
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
 
 	// 아이디찾기
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/findId")
@@ -399,6 +471,11 @@ public class PeopleController {
 			reqHeadMap = new HashMap<String, Object>();
 		}
 
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
 		Integer info = service.isPeople(reqBodyMap);
 
 		if (info == 1) {
@@ -410,11 +487,6 @@ public class PeopleController {
 			responseBodyMap.put("rsltMsg", "Success");
 			responseBodyMap.put("existYn", "N");
 		}
-
-		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
-		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
-
-		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");
 		mv.addObject(Const.HEAD, reqHeadMap);

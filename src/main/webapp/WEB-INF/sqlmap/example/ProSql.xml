@@ -15,4 +15,7 @@
 		SELECT COUNT(*) AS cnt FROM PRO WHERE PRO_ID = #{peopleId}
 	</select>
 	
+	<select id="getProInfo" parameterType="map" resultType="Talan.DTO.ProDTO">
+		SELECT * FROM PRO WHERE PRO_ID = #{proId}
+	</select>
 </mapper>
