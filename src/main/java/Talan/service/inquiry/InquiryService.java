@@ -15,6 +15,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import Talan.DTO.FeedDTO;
 import Talan.DTO.InquiryDTO;
 
 @Service
@@ -29,13 +30,13 @@ public class InquiryService {
 	@Qualifier("transactionManager_sample")
 	private DataSourceTransactionManager transactionManager_sample;
 
-	// 문의 등록 
+	// 문의 등록
 	public int registInquiry(Map<String, Object> param) {
 		// 트랜잭션 구현
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 		TransactionStatus status = transactionManager_sample.getTransaction(def);
-		
+
 		int result = 0;
 		try {
 
@@ -45,7 +46,7 @@ public class InquiryService {
 			logger.info("========== 문의 등록 완료 : {}", result);
 
 		} catch (Exception e) {
-			logger.error("[ERROR] registPro() Fail : e : {}", e.getMessage());
+			logger.error("[ERROR] registInquiry() Fail : e : {}", e.getMessage());
 			e.printStackTrace();
 			transactionManager_sample.rollback(status);
 		}
@@ -80,6 +81,67 @@ public class InquiryService {
 			list.add(inquiry.get(i).getInquiryList());
 		}
 		return list;
+	}
+
+	// 나의 문의 내역
+	public List<Object> personalList(Map<String, Object> param) {
+		List<InquiryDTO> inquiry = new ArrayList<InquiryDTO>();
+
+		inquiry = sqlSession.selectList("inquiry.getPersonalInquiryList", param);
+
+		List<Object> list = new ArrayList<Object>();
+		for (int i = 0; i < inquiry.size(); i++) {
+			list.add(inquiry.get(i).getInquiryList());
+		}
+		return list;
+	}
+
+	// 문의 상세 조회
+	public InquiryDTO detailInquiry(Map<String, Object> param) {
+		InquiryDTO inquiry = sqlSession.selectOne("inquiry.getInquiry", param);
+		return inquiry;
+	}
+
+	// 문의글 수정
+	public int updateInquiry(Map<String, Object> param) {
+		// 트랜잭션 구현
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager_sample.getTransaction(def);
+
+		int result = 0;
+		try {
+			result = sqlSession.update("inquiry.updateInquiry", param);
+			transactionManager_sample.commit(status);
+			logger.info("========== 문의 수정 완료 : {}", result);
+
+		} catch (Exception e) {
+			logger.error("[ERROR] updateInquiry() Fail : e : {}", e.getMessage());
+			e.printStackTrace();
+			transactionManager_sample.rollback(status);
+		}
+		return result;
+	}
+
+	// 문의 삭제 (관리자)
+	public int deleteInquiry(Map<String, Object> param) {
+		// 트랜잭션 구현
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager_sample.getTransaction(def);
+
+		int result = 0;
+		try {
+			result = sqlSession.update("inquiry.deleteInquiry", param);
+			transactionManager_sample.commit(status);
+			logger.info("========== 문의 삭제 완료 : {}", result);
+
+		} catch (Exception e) {
+			logger.error("[ERROR] deleteInquiry() Fail : e : {}", e.getMessage());
+			e.printStackTrace();
+			transactionManager_sample.rollback(status);
+		}
+		return result;
 	}
 
 }

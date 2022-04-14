@@ -47,6 +47,33 @@
 	<select id="getInquiryCnt" resultType="Integer">
 		SELECT COUNT(*) AS cnt FROM INQUIRY
 	</select>
+	
+	<select id="getPersonalInquiryList" parameterType="map" resultType="Talan.DTO.InquiryDTO">
+		SELECT *
+		FROM INQUIRY 
+		WHERE PEOPLE_ID = #{peopleId}
+		ORDER BY INQUIRY_NUMBER desc
+	</select>
+	
+	<select id="getPersonalInquiryCnt" resultType="Integer">
+		SELECT COUNT(*) AS cnt FROM INQUIRY WHERE PEOPLE_ID = #{peopleId}
+	</select>
+	
+	<select id="getInquiry" parameterType="map" resultType="Talan.DTO.InquiryDTO">
+		SELECT * FROM INQUIRY WHERE INQUIRY_NUMBER = #{inquiryNumber}
+	</select>
+	
+	<update id="updateInquiry">
+		UPDATE INQUIRY
+		SET INQUIRY_TITLE = #{inquiryTitle},
+		INQUIRY_CONTENT = #{inquiryContent},
+		INQUIRY_MODIFY_DATE = SYSDATE
+		WHERE INQUIRY_NUMBER = #{inquiryNumber} AND
+		PEOPLE_ID = #{peopleId} AND RESPONSE_STATUS = 0
+	</update>
 
+	<delete id="deleteInquiry">
+		DELETE FROM INQUIRY WHERE INQUIRY_NUMBER = #{inquiryNumber}
+	</delete>
 	
 </mapper>

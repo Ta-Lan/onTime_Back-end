@@ -155,7 +155,7 @@ public class EstimateController {
 		return mv;
 	}
 
-	// 견적서 매칭 
+	// 견적서 매칭
 	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/matched")
 	public ModelAndView matchedEstimate(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
@@ -169,23 +169,16 @@ public class EstimateController {
 		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
-		if (session.getAttribute("user") != null) {
-			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+		int result = service.matchedEstimate(reqBodyMap);
 
-			int result = service.matchedEstimate(reqBodyMap);
-
-			if (result > 0) {
-				responseBodyMap.put("rsltCode", "0000");
-				responseBodyMap.put("rsltMsg", "Success");
-			} else {
-				responseBodyMap.put("rsltCode", "2003");
-				responseBodyMap.put("rsltMsg", "Data not found.");
-			}
-		} else if (session.getAttribute("user") == null) {
-			responseBodyMap.put("rsltCode", "1003");
-			responseBodyMap.put("rsltMsg", "Login required.");
+		if (result > 0) {
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+		} else {
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");
@@ -194,4 +187,38 @@ public class EstimateController {
 
 		return mv;
 	}
+
+	// 견적서 거절
+	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/reject")
+	public ModelAndView rejectEstimate(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+		int result = service.rejectEstimate(reqBodyMap);
+
+		if (result > 0) {
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+		} else {
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
 }
