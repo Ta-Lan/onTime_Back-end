@@ -236,22 +236,27 @@ public class PeopleController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
 		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+		
+		if (user != null) {
+			reqBodyMap.put("peopleId", user.get("loginId"));
 
-		user = (Map<String, Object>) session.getAttribute("user");
+			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		reqBodyMap.put("peopleId", user.get("loginId"));
+			int result = service.updatePeople(reqBodyMap);
 
-		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
-
-		int result = service.updatePeople(reqBodyMap);
-
-		if (result > 0) {
-			responseBodyMap.put("rsltCode", "0000");
-			responseBodyMap.put("rsltMsg", "Success");
+			if (result > 0) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
 		} else {
-			responseBodyMap.put("rsltCode", "2003");
-			responseBodyMap.put("rsltMsg", "Data not found.");
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login required.");
 		}
+
+
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");
 		mv.addObject(Const.HEAD, reqHeadMap);

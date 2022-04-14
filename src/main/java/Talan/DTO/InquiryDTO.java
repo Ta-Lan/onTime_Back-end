@@ -1,6 +1,10 @@
 package Talan.DTO;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class InquiryDTO {
 	private String inquiryNumber;
@@ -12,6 +16,19 @@ public class InquiryDTO {
 	private Date inquiryRegisterDate;
 	private Date inquiryModifyDate;
 	private Character responseStatus;
+	
+	public Map<String, Object> getInquiryList() {
+		Map<String, Object> inquiry = new HashMap<String, Object>();
+		inquiry.put("inquiryNumber", inquiryNumber);
+		inquiry.put("peopleId", peopleId);
+		inquiry.put("inquiryTitle", inquiryTitle);
+		inquiry.put("inquiryContent", inquiryContent);
+		inquiry.put("SecretStatus", SecretStatus);
+		inquiry.put("inquiryRegisterDate", getInquiryRegisterDate());
+		inquiry.put("inquiryModifyDate", getInquiryModifyDate());
+		inquiry.put("responseStatus", responseStatus);
+		return inquiry;
+	}
 	
 	public String getInquiryNumber() {
 		return inquiryNumber;
@@ -49,14 +66,19 @@ public class InquiryDTO {
 	public void setInquiryPassword(String inquiryPassword) {
 		this.inquiryPassword = inquiryPassword;
 	}
-	public Date getInquiryRegisterDate() {
-		return inquiryRegisterDate;
+	public String getInquiryRegisterDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strInquiryRegisterDate = dateFormat.format(inquiryRegisterDate);
+		return strInquiryRegisterDate;
 	}
 	public void setInquiryRegisterDate(Date inquiryRegisterDate) {
 		this.inquiryRegisterDate = inquiryRegisterDate;
 	}
-	public Date getInquiryModifyDate() {
-		return inquiryModifyDate;
+	public String getInquiryModifyDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strInquiryModifyDate = dateFormat.format(inquiryModifyDate);
+		return strInquiryModifyDate;
+
 	}
 	public void setInquiryModifyDate(Date inquiryModifyDate) {
 		this.inquiryModifyDate = inquiryModifyDate;

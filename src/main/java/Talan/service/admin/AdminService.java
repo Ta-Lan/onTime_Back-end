@@ -1,4 +1,4 @@
-package Talan.service.review;
+package Talan.service.admin;
 
 import java.util.Map;
 
@@ -12,9 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import Talan.DTO.ProDTO;
 
 @Service
-public class ReviewService {
+public class AdminService {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -25,27 +29,5 @@ public class ReviewService {
 	@Autowired(required = true)
 	@Qualifier("transactionManager_sample")
 	private DataSourceTransactionManager transactionManager_sample;
-
-	public int registReview(Map<String, Object> param) {
-		//트랜잭션 구현
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-        TransactionStatus status = transactionManager_sample.getTransaction(def);
-
-        int result = 0;
-        try{
-           
-            result = sqlSession.insert("review.registReview", param);
-            
-            transactionManager_sample.commit(status);
-            logger.info("========== 리뷰 등록 완료 : {}", result);
-            
-        }catch(Exception e){
-        	logger.error("[ERROR] registReview() Fail : e : {}", e.getMessage());
-        	e.printStackTrace();
-        	transactionManager_sample.rollback(status);    	
-        }
-		return result;
-	}
-
+	
 }

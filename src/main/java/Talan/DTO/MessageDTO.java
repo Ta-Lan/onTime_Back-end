@@ -66,7 +66,7 @@ public class MessageDTO {
     }
 
     public String getMessageTime() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm:ss");
         String strMessageTime = dateFormat.format(messageTime);
         return strMessageTime;
 

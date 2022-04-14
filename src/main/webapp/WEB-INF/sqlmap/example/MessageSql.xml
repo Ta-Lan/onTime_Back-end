@@ -22,6 +22,7 @@
         select *
         from MESSAGE
         where CHAT_NUMBER = #{chatNumber}
+        order by MESSAGE_TIME asc
     </select>
     
     <insert id="insertMessage" parameterType="map">
@@ -53,7 +54,7 @@
     <select id="getChatList" parameterType="map" resultType="Talan.DTO.MessageDTO">
      	select * from message 
      	where message_time in 
-     	(select MAX(MESSAGE_TIME) from message 
+     	(select MAX(message_time) from message 
      	where message_sender = #{loginId} or message_receiver = #{loginId}
      	group by chat_number) order by message_time desc
     </select>
