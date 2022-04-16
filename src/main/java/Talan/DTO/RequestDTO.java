@@ -20,11 +20,24 @@ public class RequestDTO {
 	private String district;
 	private Integer taskLevel;
 	
+	private Map<String, String> categoryList = new HashMap<String, String>() {
+		{
+			put("lesson", "레슨");
+			put("home", "홈/리빙");
+			put("event", "이벤트");
+			put("business", "비즈니스");
+			put("design", "디자인/개발");
+			put("part-time-job", "아르바이트");
+			put("health", "건강/미용");
+			put("etc", "기타");
+		}
+	};
+	
 	public Map<String, Object> getRequestList() {
 		Map<String, Object> request = new HashMap<String, Object>();
 		request.put("requestNumber", requestNumber);
 		request.put("peopleId", peopleId);
-		request.put("category", category);
+		request.put("category", getCategory());
 		request.put("requestDate", getRequestDate());
 		request.put("requestTitle", requestTitle);
 		request.put("requestContent", requestContent);
@@ -50,7 +63,8 @@ public class RequestDTO {
 		this.peopleId = peopleId;
 	}
 	public String getCategory() {
-		return category;
+		String strCateogory = categoryList.get(category).toString();
+		return strCateogory;
 	}
 	public void setCategory(String category) {
 		this.category = category;
@@ -82,7 +96,7 @@ public class RequestDTO {
 		this.preference = preference;
 	}
 	public String getRequestRegisterDate() {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.");
 		String strRequestRegisterDate = dateFormat.format(requestRegisterDate);
 		return strRequestRegisterDate;
 	}

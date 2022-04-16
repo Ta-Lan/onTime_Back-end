@@ -1,6 +1,7 @@
 package Talan.service.request;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import Talan.DTO.FeedDTO;
+import Talan.DTO.PeopleDTO;
 import Talan.DTO.RequestDTO;
 
 @Service
@@ -53,30 +55,14 @@ public class RequestService {
 		return result;
 	}
 
-	// 요청서 리스트
-	public List<Object> requestList(Map<String, Object> param) {
+	// 나의 요청서
+	public List<Object> requestMyList(Map<String, Object> param) {
 		List<RequestDTO> request = new ArrayList<RequestDTO>();
 
-		if (param.get("lastRequestNumber").equals("0")) {
-			param.replace("lastRequestNumber", "0", sqlSession.selectOne("request.getLastRequestNumber"));
-		} else {
-			String strlastRequestNumber = param.get("lastRequestNumber").toString();
-			int lastRequestNumber = Integer.parseInt(strlastRequestNumber.substring(7)) - 1;
-			param.replace("lastRequestNumber", "REQUEST" + lastRequestNumber);
-		}
-
-		int requestCnt = sqlSession.selectOne("request.getRequestCnt");
-		if ((Integer.parseInt(param.get("cnt").toString()) > requestCnt)
-				|| Integer.parseInt(param.get("cnt").toString()) == 0) {
-			param.replace("cnt", requestCnt);
-		}
-
-		request = sqlSession.selectList("request.getRequestList", param);
-
-		int cnt = Integer.parseInt(param.get("cnt").toString()) - 1;
+		request = sqlSession.selectList("request.getRequestMyList", param);
 
 		List<Object> list = new ArrayList<Object>();
-		for (int i = 0; i <= cnt; i++) {
+		for (int i = 0; i < request.size(); i++) {
 			list.add(request.get(i).getRequestList());
 		}
 		return list;
@@ -106,7 +92,13 @@ public class RequestService {
 
 		List<Object> list = new ArrayList<Object>();
 		for (int i = 0; i <= cnt; i++) {
-			list.add(request.get(i).getRequestList());
+			PeopleDTO peopleInfo = new PeopleDTO();
+			Map<String, Object> preList = new HashMap<String, Object>();
+			peopleInfo = sqlSession.selectOne("people.getPeopleInfo", request.get(i).getPeopleId());
+			
+			preList.put("nickname", peopleInfo.getNickname());
+			preList.putAll(request.get(i).getRequestList());
+			list.add(preList);
 		}
 		return list;
 	}

@@ -1,6 +1,8 @@
 package Talan.controller;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +60,7 @@ public class FeedController {
 		if (session.getAttribute("user") != null) {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
-			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user);
+			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user.get("loginId"));
 
 			reqBodyMap.put("proId", user.get("loginId"));
 			reqBodyMap.put("feedWriterNickname", peopleDTO.getNickname());
@@ -106,6 +108,7 @@ public class FeedController {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
 			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user.get("loginId"));
+			System.out.println();
 
 			reqBodyMap.put("proId", user.get("loginId"));
 			reqBodyMap.put("feedWriterNickname", peopleDTO.getNickname());
@@ -113,8 +116,19 @@ public class FeedController {
 			reqBodyMap.put("feedContent", request.getParameter("feedContent"));
 
 			//////////////////////////// IMAGE UPLOAD////////////////////////////
+			
+			InetAddress addr = null;
+			try {
+				addr = InetAddress.getLocalHost();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+			String ip = addr.getHostAddress();
+			String http = "http://";
+			String port = ":8888";
+			String server = http + ip + port;
 
-			String fileDir = "/image/feedImage";
+			String fileDir = "/image/feedImage/";
 			String filePath = request.getServletContext().getRealPath(fileDir);
 			System.out.println(filePath);
 			MultipartFile image = request.getFile("image");
@@ -128,7 +142,7 @@ public class FeedController {
 
 			String storeFileName = storeName + extension;
 
-			File file = new File(filePath + "/" + storeFileName);
+			File file = new File(filePath + storeFileName);
 			try {
 				image.transferTo(file); // 파일을 저장
 			} catch (Exception e) {
@@ -137,7 +151,7 @@ public class FeedController {
 
 			reqBodyMap.put("storeFileName", storeFileName);
 			reqBodyMap.put("originFileName", originalFile);
-			reqBodyMap.put("filePath", filePath);
+			reqBodyMap.put("filePath", server+fileDir);
 
 			//////////////////////////// IMAGE UPLOAD////////////////////////////
 
@@ -356,16 +370,27 @@ public class FeedController {
 		if (session.getAttribute("user") != null) {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
-			PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", user);
-
 			reqBodyMap.put("proId", user.get("loginId"));
 			reqBodyMap.put("feedNumber", request.getParameter("feedNumber"));
 			reqBodyMap.put("feedTitle", request.getParameter("feedTitle"));
 			reqBodyMap.put("feedContent", request.getParameter("feedContent"));
+			
+			System.out.println("BODY ::::::::: " + reqBodyMap);
 
 			//////////////////////////// IMAGE UPLOAD////////////////////////////
+			
+			InetAddress addr = null;
+			try {
+				addr = InetAddress.getLocalHost();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+			String ip = addr.getHostAddress();
+			String http = "http://";
+			String port = ":8888";
+			String server = http + ip + port;
 
-			String fileDir = "/image/feedImage";
+			String fileDir = "/image/feedImage/";
 			String filePath = request.getServletContext().getRealPath(fileDir);
 			System.out.println(filePath);
 			MultipartFile image = request.getFile("image");
@@ -379,7 +404,7 @@ public class FeedController {
 
 			String storeFileName = storeName + extension;
 
-			File file = new File(filePath + "/" + storeFileName);
+			File file = new File(filePath + storeFileName);
 			try {
 				image.transferTo(file); // 파일을 저장
 			} catch (Exception e) {
@@ -388,7 +413,7 @@ public class FeedController {
 
 			reqBodyMap.put("storeFileName", storeFileName);
 			reqBodyMap.put("originFileName", originalFile);
-			reqBodyMap.put("filePath", filePath);
+			reqBodyMap.put("filePath", server+fileDir);
 
 			//////////////////////////// IMAGE UPLOAD////////////////////////////
 

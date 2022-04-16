@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="review">
+
+	<sql id="setReviewNumber">
+		SELECT CONCAT('REVIEW',
+		NVL(MAX(SUBSTR(REVIEW_NUMBER,7)),100000)+ 1) FROM REVIEW
+	</sql>
+	
+	<insert id="registReview">
+		INSERT INTO REVIEW (REVIEW_NUMBER, PAYMENT_NUMBER, PEOPLE_ID, REVIEW_TITLE, REVIEW_CONTENT, STAR_POINT, PRO_ID)
+		VALUES
+		( (<include refid="setReviewNumber"/>), #{paymentNumber}, #{peopleId}, #{reviewTitle}, #{reviewContent}, #{starPoint}, #{proId} )
+	</insert>
+	
+	<select id="getProPoint" parameterType="map" resultType="map">
+		select COUNT(*) review_count, AVG(STAR_POINT) kind_score FROM REVIEW WHERE PRO_ID = #{proId}
+	</select>
+
+</mapper>

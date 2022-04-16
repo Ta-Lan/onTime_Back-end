@@ -111,7 +111,7 @@ public class FeedService {
 			logger.info("========== 피드 수정(이미지) 완료 : {}", result);
 
 		} catch (Exception e) {
-			logger.error("[ERROR] updateFeed() Fail : e : {}", e.getMessage());
+			logger.error("[ERROR] updateFeedWithImage() Fail : e : {}", e.getMessage());
 			e.printStackTrace();
 			transactionManager_sample.rollback(status);
 		}

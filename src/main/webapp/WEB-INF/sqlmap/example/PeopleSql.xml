@@ -25,13 +25,20 @@
 	</insert>
 	
 	<insert id="insertPeopleWithImage">
-		INSERT INTO PEOPLE VALUES (#{peopleId}, #{password}, #{name}, #{birth}, #{nickname}, #{address}, #{phone}, #{intro}, #{gender}, #{email},
-	    	 #{account}, #{storeImageName}, #{originImageName}, #{filePath})
+		INSERT INTO PEOPLE(PEOPLE_ID, PASSWORD, NAME, BIRTH, NICKNAME, ADDRESS, PHONE, INTRO, GENDER, EMAIL, ACCOUNT, STORE_IMAGE_NAME, ORIGIN_IMAGE_NAME, IMAGE_PATH) 
+		VALUES (#{peopleId}, #{password}, #{name}, #{birth}, #{nickname}, #{address}, #{phone}, #{intro}, #{gender}, #{email},
+	    	 #{account}, #{storeImageName}, #{originImageName}, #{imagePath})
 	</insert>
+	
+	<update id="updateIntro">
+		UPDATE PEOPLE
+		SET	INTRO = #{intro}
+		WHERE PEOPLE_ID = #{peopleId}
+	</update>
 	
 	<update id="updatePeople">
 		UPDATE PEOPLE
-		SET	NAME = #{name}, BIRTH = #{birth}, NICKNAME = #{nickname}, ADDRESS = #{address}, PHONE = #{phone}, INTRO = #{intro}
+		SET	NAME = #{name}, BIRTH = #{birth}, NICKNAME = #{nickname}, ADDRESS = #{address}, PHONE = #{phone}, EMAIL = #{email}, ACCOUNT = #{account}
 		WHERE PEOPLE_ID = #{peopleId}
 	</update>
 	

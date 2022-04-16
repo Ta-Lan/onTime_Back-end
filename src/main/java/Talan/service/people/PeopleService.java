@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.mindrot.bcrypt.BCrypt;
 
 import Talan.DTO.PeopleDTO;
 
@@ -27,6 +28,10 @@ public class PeopleService {
     @Autowired(required=true)
     @Qualifier("transactionManager_sample")
     private DataSourceTransactionManager transactionManager_sample;
+    
+    @Autowired(required = true)
+    @Qualifier("bCrypt")
+    private BCrypt bCrypt;
 	
     //회원정보
 	public PeopleDTO getPeopleInfo( Map<String,Object> param ) {
@@ -40,6 +45,8 @@ public class PeopleService {
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = transactionManager_sample.getTransaction(def);
 
+        param.replace("password", bCrypt.hashpw(param.get("password").toString(), bCrypt.gensalt()));
+        
         int result = 0;
         try{
            
@@ -63,6 +70,8 @@ public class PeopleService {
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = transactionManager_sample.getTransaction(def);
 
+        param.replace("password", bCrypt.hashpw(param.get("password").toString(), bCrypt.gensalt()));
+        
         int result = 0;
         try{
            
@@ -81,7 +90,6 @@ public class PeopleService {
 	
 	//회원정보 수정
 	public int updatePeople( Map<String,Object> param ) {
-		//�듃�젋�젥�뀡 援ы쁽
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = transactionManager_sample.getTransaction(def);
@@ -90,16 +98,36 @@ public class PeopleService {
         try{
            
         	PeopleDTO info = sqlSession.selectOne("people.getPeopleInfo", param);
-        	
-        	if( param.get("password").equals(info.getPassword()) ) {
         		result = sqlSession.update("people.updatePeople", param);
-        	}
+        	
             
             transactionManager_sample.commit(status);
             logger.info("========== 유저 수정 완료 : {}", result);
             
         }catch(Exception e){
         	logger.error("[ERROR] updatePeople() Fail : e : {}", e.getMessage());
+        	e.printStackTrace();
+        	transactionManager_sample.rollback(status);    	
+        }
+		return result;
+	}
+	
+	// 내 소개 수정  
+	public int updateIntro(Map<String, Object> param) {
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager_sample.getTransaction(def);
+
+        int result = 0;
+        try{
+        	result = sqlSession.update("people.updateIntro", param);
+        	
+            
+            transactionManager_sample.commit(status);
+            logger.info("========== 유저 소개 수정 완료 : {}", result);
+            
+        }catch(Exception e){
+        	logger.error("[ERROR] updateIntro() Fail : e : {}", e.getMessage());
         	e.printStackTrace();
         	transactionManager_sample.rollback(status);    	
         }
@@ -116,7 +144,7 @@ public class PeopleService {
 		try {
 			result = sqlSession.delete("people.deletePeople", param);
 			transactionManager_sample.commit(status);
-	        logger.info("========== 유저 삭제 완료 : {}", result);
+	        logger.info("========== 유저 탈퇴 완료 : {}", result);
 		}
 		catch(Exception e) {
 			logger.error("[ERROR] deletePeople() Fail : e : {}", e.getMessage());
@@ -131,10 +159,10 @@ public class PeopleService {
         int result = 0;
         try{        
         	PeopleDTO info = sqlSession.selectOne("people.getSession", param);
-        	if( param.get("password").equals(info.getPassword()) ) {
+        	if( bCrypt.checkpw(param.get("password").toString(), info.getPassword()) ) {
         		result = 1;
         	}
-        	else if(!param.get("password").equals(info.getPassword())) {
+        	else {
         		result = -1;
         	}
         }catch(Exception e){
@@ -143,12 +171,6 @@ public class PeopleService {
         }
 		return result;
 	}
-//	로그아웃	
-//	public int logoutpeople(Map<String, Object> param) {
-//		int result = 0;
-//		return result = sqlSession.selectOne("people.loginpeople", param);
-//		
-//	}
 	
 	
 	//아이디찾기
@@ -214,9 +236,6 @@ public class PeopleService {
 			return 0;
 		}
 	}
-
-
-	
 
 	
 }
