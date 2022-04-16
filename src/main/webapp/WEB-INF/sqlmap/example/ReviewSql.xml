@@ -11,9 +11,13 @@
 	</sql>
 	
 	<insert id="registReview">
-		INSERT INTO REVIEW
+		INSERT INTO REVIEW (REVIEW_NUMBER, PAYMENT_NUMBER, PEOPLE_ID, REVIEW_TITLE, REVIEW_CONTENT, STAR_POINT, PRO_ID)
 		VALUES
-		( (<include refid="setReviewNumber"/>), #{paymentNumber}, #{PEOPLE_ID}, #{REVIEW_TITLE}, #{REVIEW_CONTENT}, #{STAR_POINT}, #{PRO_ID}, #{REVIEW_RESPONSE} )
+		( (<include refid="setReviewNumber"/>), #{paymentNumber}, #{peopleId}, #{reviewTitle}, #{reviewContent}, #{starPoint}, #{proId} )
 	</insert>
+	
+	<select id="getProPoint" parameterType="map" resultType="map">
+		select COUNT(*) review_count, AVG(STAR_POINT) kind_score FROM REVIEW WHERE PRO_ID = #{proId}
+	</select>
 
 </mapper>

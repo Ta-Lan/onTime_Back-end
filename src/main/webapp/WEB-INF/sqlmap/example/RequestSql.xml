@@ -38,24 +38,8 @@
         </if>
 	</select>
 
-	<select id="getRequestList" parameterType="map" resultType="Talan.DTO.RequestDTO">
-		SELECT REQUEST_NUMBER, PEOPLE_ID, CATEGORY, REQUEST_DATE, REQUEST_TITLE, REQUEST_CONTENT, PREFERENCE, REQUEST_REGISTER_DATE, REQUEST_STATUS,
-        TOWN, DISTRICT, TASK_LEVEL
-		FROM
-		(
-		SELECT ROWNUM, REQUEST_NUMBER, PEOPLE_ID, CATEGORY, REQUEST_DATE, REQUEST_TITLE, REQUEST_CONTENT, PREFERENCE, REQUEST_REGISTER_DATE, REQUEST_STATUS,
-        TOWN, DISTRICT, TASK_LEVEL
-		FROM
-		(
-		SELECT *
-		FROM REQUEST
-		ORDER BY REQUEST_NUMBER DESC
-		)
-		<![CDATA[
-		WHERE REQUEST_NUMBER <= #{lastRequestNumber}
-		)
-		WHERE ROWNUM <= #{cnt}
-		]]>
+	<select id="getRequestMyList" parameterType="map" resultType="Talan.DTO.RequestDTO">
+		SELECT * FROM REQUEST WHERE PEOPLE_ID = #{peopleId}
 	</select>
 	
 	<select id="getRequestSearchList" parameterType="map" resultType="Talan.DTO.RequestDTO">

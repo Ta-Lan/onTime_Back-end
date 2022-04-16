@@ -47,10 +47,11 @@ public class SampleDecryptCtrl {
         //클라이언트에서 넘어온 request(HEAD+BODY) 모든정보
         Map<String,Object> reqMap =  (Map<String,Object>)request.getAttribute(Const.HTTP_BODY);
         //클라이언트에서 넘어온 공통 헤더 맵정보
-        Map<String,Object> reqHeadMap =  (Map<String,Object>)request.getAttribute(Const.HEAD);
+        // Map<String,Object> reqHeadMap =  (Map<String,Object>)request.getAttribute(Const.HEAD);
         //클라이언트에서 넘긴 파라미터 맵정보
         Map<String,Object> reqBodyMap =  (Map<String,Object>)request.getAttribute(Const.BODY);
         //클라이언트에서 넘길 Response 맵 세팅
+        Map<String,Object> reqHeadMap = null;
         Map<String,Object> responseMap = new HashMap<String, Object>();
         Map<String, Object> responseBodyMap= new HashMap<String, Object>();
         if(reqHeadMap==null){
@@ -67,7 +68,7 @@ public class SampleDecryptCtrl {
              * 만약, 클라이언트에 에러처리를 하고 싶다면  responseMap.setResultCode(Const.EXCEPTION_ERROR); 사용
              **************************************************************************************************/
 
-            cryptoUtil.initial(reqHeadMap.get("appid").toString());
+            // cryptoUtil.initial(reqHeadMap.get("appid").toString());
             String encryptString = cryptoUtil.encrypt("안녕하세요. Uracle 암호화 샘플입니다!");
             logger.info("#### 암호화 값:"+encryptString);
 

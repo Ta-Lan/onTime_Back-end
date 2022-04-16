@@ -8,7 +8,7 @@
 	<insert id="registPro">
 		INSERT INTO PRO
 		VALUES
-		( #{proId}, #{kindScore}, #{category}, #{license} )
+		( #{proId}, #{kindScore}, #{category}, #{license}, #{registContent}, #{experiencePeriod} )
 	</insert>
 	
 	<select id="isProRegisted" resultType="Integer">
@@ -18,4 +18,10 @@
 	<select id="getProInfo" parameterType="map" resultType="Talan.DTO.ProDTO">
 		SELECT * FROM PRO WHERE PRO_ID = #{proId}
 	</select>
+	
+	<update id="updateProKindScore">
+		UPDATE PRO
+		SET KIND_SCORE = (SELECT AVG(STAR_POINT) KIND_SCORE FROM REVIEW WHERE PRO_ID = #{proId})
+		WHERE PRO_ID = #{proId}
+	</update>
 </mapper>

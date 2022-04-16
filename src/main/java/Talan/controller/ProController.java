@@ -1,9 +1,5 @@
 package Talan.controller;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,18 +8,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
+import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import Talan.DTO.PeopleDTO;
 import Talan.DTO.ProDTO;
 import Talan.service.pro.ProService;
 import kr.msp.constant.Const;
@@ -35,6 +31,10 @@ public class ProController {
 
 	@Autowired(required = true)
 	private ProService service;
+	
+	@Autowired(required = true)
+	@Qualifier("sqlSession_sample")
+	private SqlSession sqlSession;
 
 	// PRO 등록
 	@RequestMapping(method = RequestMethod.POST, value = "/api/pro/regist")
@@ -98,6 +98,7 @@ public class ProController {
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 		ProDTO info = service.getProInfo(reqBodyMap);
+		PeopleDTO people = sqlSession.selectOne("people.getPeopleInfo", info.getProId());
 
 		if (!StringUtils.isEmpty(info)) {
 			responseBodyMap.put("rsltCode", "0000");
@@ -105,7 +106,14 @@ public class ProController {
 			responseBodyMap.put("proId", info.getProId());
 			responseBodyMap.put("category", info.getCategory());
 			responseBodyMap.put("license", info.getLicense());
+			responseBodyMap.put("content", info.getContent());
+			responseBodyMap.put("experiencePeriod", info.getExperiencePeriod());
 			responseBodyMap.put("kindScore", info.getKindScore());
+			responseBodyMap.put("storeImageName", people.getStoreImageName());
+			responseBodyMap.put("originImageName", people.getOriginImageName());
+			responseBodyMap.put("imagePath", people.getImagePath());
+			responseBodyMap.put("nickname", people.getNickname());
+			responseBodyMap.put("intro", people.getIntro());
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");

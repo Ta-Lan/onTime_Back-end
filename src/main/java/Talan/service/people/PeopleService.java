@@ -144,7 +144,7 @@ public class PeopleService {
 		try {
 			result = sqlSession.delete("people.deletePeople", param);
 			transactionManager_sample.commit(status);
-	        logger.info("========== 유저 삭제 완료 : {}", result);
+	        logger.info("========== 유저 탈퇴 완료 : {}", result);
 		}
 		catch(Exception e) {
 			logger.error("[ERROR] deletePeople() Fail : e : {}", e.getMessage());

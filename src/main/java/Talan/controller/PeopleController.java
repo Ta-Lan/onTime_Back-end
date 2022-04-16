@@ -24,7 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import Talan.DTO.AdminDTO;
 import Talan.DTO.PeopleDTO;
+import Talan.service.admin.AdminService;
 import Talan.service.people.PeopleService;
 import Talan.service.pro.ProService;
 import kr.msp.constant.Const;
@@ -43,7 +45,9 @@ public class PeopleController {
 
 	@Autowired(required = true)
 	private ProService proService;
-	
+
+	@Autowired(required = true)
+	private AdminService adminService;
 
 	// 회원정보
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/info")
@@ -63,7 +67,7 @@ public class PeopleController {
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 		PeopleDTO info = service.getPeopleInfo(reqBodyMap);
-		
+
 		int proRegisted = proService.isProRegisted(info.getPeopleId());
 		boolean isPro = false;
 
@@ -162,7 +166,7 @@ public class PeopleController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
 		//////////////////////////// IMAGE UPLOAD////////////////////////////
-		
+
 		InetAddress addr = null;
 		try {
 			addr = InetAddress.getLocalHost();
@@ -236,7 +240,7 @@ public class PeopleController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
 		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
-		
+
 		if (user != null) {
 			reqBodyMap.put("peopleId", user.get("loginId"));
 
@@ -255,8 +259,6 @@ public class PeopleController {
 			responseBodyMap.put("rsltCode", "1003");
 			responseBodyMap.put("rsltMsg", "Login required.");
 		}
-
-
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");
 		mv.addObject(Const.HEAD, reqHeadMap);
@@ -361,44 +363,62 @@ public class PeopleController {
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		Map<String, String> user = new HashMap<String, String>();
-
-		PeopleDTO DTO = sqlSession.selectOne("people.getSession", reqBodyMap);
-
-		int result = service.loginPeople(reqBodyMap);
-		int proRegisted = proService.isProRegisted(DTO.getPeopleId());
-		boolean isPro = false;
-
-		if (proRegisted == 1) {
-			isPro = true;
-		}
-
-		if (result == 1) {
-			responseBodyMap.put("rsltCode", "0000");
-			responseBodyMap.put("rsltMsg", "Success");
-			user.put("loginId", DTO.getPeopleId());
-			user.put("password", DTO.getPassword());
-			session.setAttribute("user", user);
-			responseBodyMap.put("session", DTO);
-			responseBodyMap.put("isProRegisted", isPro);
-
-		} else if (result == -1) {
-			responseBodyMap.put("rsltCode", "2001");
-			responseBodyMap.put("rsltMsg", "ID or PWD not correct");
+		if (reqBodyMap.get("peopleId").toString().equals("admin")) {
+			int result = adminService.loginAdmin(reqBodyMap);
+			if (result == 1) {
+				AdminDTO DTO = sqlSession.selectOne("admin.loginAdmin", reqBodyMap);
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+				responseBodyMap.put("session", DTO);
+				session.setAttribute("loginId", reqBodyMap.get("peopleId"));
+			} else if (result == -1) {
+				responseBodyMap.put("rsltCode", "2001");
+				responseBodyMap.put("rsltMsg", "ID or PWD not correct");
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
 		} else {
-			responseBodyMap.put("rsltCode", "2003");
-			responseBodyMap.put("rsltMsg", "Data not found.");
-		}
 
+			Map<String, String> user = new HashMap<String, String>();
+
+			PeopleDTO DTO = sqlSession.selectOne("people.getSession", reqBodyMap);
+
+			int result = service.loginPeople(reqBodyMap);
+			int proRegisted = proService.isProRegisted(DTO.getPeopleId());
+			boolean isPro = false;
+
+			if (proRegisted == 1) {
+				isPro = true;
+			}
+
+			if (result == 1) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+				user.put("loginId", DTO.getPeopleId());
+				user.put("password", DTO.getPassword());
+				session.setAttribute("user", user);
+				responseBodyMap.put("session", DTO);
+				responseBodyMap.put("isProRegisted", isPro);
+
+			} else if (result == -1) {
+				responseBodyMap.put("rsltCode", "2001");
+				responseBodyMap.put("rsltMsg", "ID or PWD not correct");
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
+		}
 		ModelAndView mv = new ModelAndView("defaultJsonView");
 		mv.addObject(Const.HEAD, reqHeadMap);
 		mv.addObject(Const.BODY, responseBodyMap);
 
 		return mv;
+
 	}
 
 	// 로그아웃
-	@RequestMapping(method = RequestMethod.POST, value = "/api/people/loginout")
+	@RequestMapping(method = RequestMethod.POST, value = "/api/people/logout")
 	public ModelAndView logoutPeople(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);

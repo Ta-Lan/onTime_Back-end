@@ -71,6 +71,12 @@
 		WHERE INQUIRY_NUMBER = #{inquiryNumber} AND
 		PEOPLE_ID = #{peopleId} AND RESPONSE_STATUS = 0
 	</update>
+	
+	<update id="setInquiryStatus">
+		UPDATE INQUIRY
+		SET INQUIRY_STATUS = 1
+		WHERE INQUIRY_NUMBER = #{inquiryNumber}
+	</update>
 
 	<delete id="deleteInquiry">
 		DELETE FROM INQUIRY WHERE INQUIRY_NUMBER = #{inquiryNumber}

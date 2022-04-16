@@ -85,10 +85,12 @@ public class MessageController {
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 		int result = service.insertMessage(reqBodyMap);
+		String chatNumber = sqlSession.selectOne("message.getChatNumber", reqBodyMap);
 
 		if (result > 0) {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
+			responseBodyMap.put("chatNumber", chatNumber);
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
@@ -126,7 +128,7 @@ public class MessageController {
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-			List<Object> list = service.getChatList(reqBodyMap);
+			List<Object> list = service.getChatList(reqBodyMap, session);
 
 			logger.info("======================= list  : {}", list.toString());
 

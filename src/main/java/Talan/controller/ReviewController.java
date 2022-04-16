@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import Talan.DTO.PaymentDetailDTO;
 import Talan.service.review.ReviewService;
 import kr.msp.constant.Const;
 
@@ -49,15 +50,18 @@ public class ReviewController {
         
         if (session.getAttribute("user") != null) {
     		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
-          
-            reqBodyMap.put("proId", user.get("loginId"));
-            reqBodyMap.put("kindScore", 0);
+    		
+    		PaymentDetailDTO payment = sqlSession.selectOne("payment.getPayment", reqBodyMap.get("paymentNumber"));
+            reqBodyMap.put("peopleId", user.get("loginId"));
+            reqBodyMap.put("proId", payment.getProId());
+            
             
             logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
             
             int result = service.registReview(reqBodyMap);
-            
+           
             if( result > 0 ) {
+            	 sqlSession.update("pro.updateProKindScore");
             	responseBodyMap.put("rsltCode", "0000");
                 responseBodyMap.put("rsltMsg", "Success");
             } else {

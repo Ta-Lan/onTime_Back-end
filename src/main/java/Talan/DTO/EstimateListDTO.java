@@ -22,6 +22,19 @@ public class EstimateListDTO {
 	Date estimateRegisterDate;
 	String estimateStatus;
 	
+	private Map<String, String> categoryList = new HashMap<String, String>() {
+		{
+			put("lesson", "레슨");
+			put("home", "홈/리빙");
+			put("event", "이벤트");
+			put("business", "비즈니스");
+			put("design", "디자인/개발");
+			put("part-time-job", "아르바이트");
+			put("health", "건강/미용");
+			put("etc", "기타");
+		}
+	};
+	
 	public Map<String, String> getEstimateList() {
 		Map<String, String> estimateList = new HashMap<String, String>();
 		
@@ -30,7 +43,7 @@ public class EstimateListDTO {
 		estimateList.put("originImageName", originImageName);
 		estimateList.put("imagePath", imagePath);
 		estimateList.put("requestNumber", requestNumber);
-		estimateList.put("category", category);
+		estimateList.put("category", getCategory());
 		estimateList.put("estimateNumber", estimateNumber);
 		estimateList.put("proId", proId);
 		estimateList.put("predictTime", predictTime);
@@ -74,7 +87,8 @@ public class EstimateListDTO {
 		this.requestNumber = requestNumber;
 	}
 	public String getCategory() {
-		return category;
+		String strCateogory = categoryList.get(category).toString();
+		return strCateogory;
 	}
 	public void setCategory(String category) {
 		this.category = category;

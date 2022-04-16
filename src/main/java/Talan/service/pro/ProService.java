@@ -46,7 +46,6 @@ public class ProService {
 
 		int result = 0;
 		try {
-
 			result = sqlSession.insert("pro.registPro", param);
 
 			transactionManager_sample.commit(status);
@@ -66,6 +65,7 @@ public class ProService {
 		return result;
 	}
 
+	// 고수 조회
 	public ProDTO getProInfo(Map<String, Object> param) {
 		ProDTO info = sqlSession.selectOne("pro.getProInfo", param);
 

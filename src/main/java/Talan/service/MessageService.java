@@ -1,8 +1,11 @@
 package Talan.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpSession;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -16,6 +19,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import Talan.DTO.MessageDTO;
+import Talan.DTO.PeopleDTO;
 import Talan.DTO.RequestDTO;
 
 @Service
@@ -111,13 +115,34 @@ public class MessageService {
     }
     
     // 채팅방 리스트
-	public List<Object> getChatList(Map<String, Object> param) {
-		List<MessageDTO> dto = sqlSession.selectList("message.getChatList", param);
+	public List<Object> getChatList(Map<String, Object> param, HttpSession session) {
 		
+		Map<String, String> user = (Map<String, String>) session.getAttribute("user");
+		List<MessageDTO> dto = sqlSession.selectList("message.getChatList", param);
+	
 		List<Object> list = new ArrayList<Object>();
 		for (int i = 0; i < dto.size(); i++) {
-			System.out.println("TIME::::::::::::"+dto.get(i).getMessageTime()); 
-			list.add(dto.get(i).getChatList());
+			PeopleDTO peopleInfo = new PeopleDTO();
+			Map<String, String> people = new HashMap<String, String>();
+			Map<String, String> preList = new HashMap<String, String>();
+			if (dto.get(i).getMessageReceiver().equals(user.get("loginId"))) {
+				peopleInfo = sqlSession.selectOne("people.getPeopleInfo", dto.get(i).getMessageSender());
+				people.put("nickname", peopleInfo.getNickname());
+				people.put("storeImageName", peopleInfo.getStoreImageName());
+				people.put("originImageName", peopleInfo.getOriginImageName());
+				people.put("imagePath", peopleInfo.getImagePath());
+				
+			} else if (dto.get(i).getMessageSender().equals(user.get("loginId"))) {
+				peopleInfo = sqlSession.selectOne("people.getPeopleInfo", dto.get(i).getMessageReceiver());
+				people.put("nickname", peopleInfo.getNickname());
+				people.put("storeImageName", peopleInfo.getStoreImageName());
+				people.put("originImageName", peopleInfo.getOriginImageName());
+				people.put("imagePath", peopleInfo.getImagePath());
+			}
+			preList.putAll(dto.get(i).getChatList());
+			preList.putAll(people);
+			
+			list.add(preList);
 		}
 		
 		return list;
