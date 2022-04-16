@@ -68,7 +68,7 @@ public class EstimateDTO {
 		this.estimateContent = estimateContent;
 	}
 	public String getEstimateRegisterDate() {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.");
 		String strEstimateRegisterDate = dateFormat.format(estimateRegisterDate);
 		return strEstimateRegisterDate;
 	}

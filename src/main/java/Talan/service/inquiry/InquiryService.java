@@ -123,25 +123,4 @@ public class InquiryService {
 		return result;
 	}
 
-	// 문의 삭제 (관리자)
-	public int deleteInquiry(Map<String, Object> param) {
-		// 트랜잭션 구현
-		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		TransactionStatus status = transactionManager_sample.getTransaction(def);
-
-		int result = 0;
-		try {
-			result = sqlSession.update("inquiry.deleteInquiry", param);
-			transactionManager_sample.commit(status);
-			logger.info("========== 문의 삭제 완료 : {}", result);
-
-		} catch (Exception e) {
-			logger.error("[ERROR] deleteInquiry() Fail : e : {}", e.getMessage());
-			e.printStackTrace();
-			transactionManager_sample.rollback(status);
-		}
-		return result;
-	}
-
 }

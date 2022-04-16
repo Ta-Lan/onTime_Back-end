@@ -77,9 +77,8 @@
 		SET INQUIRY_STATUS = 1
 		WHERE INQUIRY_NUMBER = #{inquiryNumber}
 	</update>
-
+	
 	<delete id="deleteInquiry">
 		DELETE FROM INQUIRY WHERE INQUIRY_NUMBER = #{inquiryNumber}
 	</delete>
-	
 </mapper>

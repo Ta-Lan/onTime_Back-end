@@ -3,6 +3,7 @@ package Talan.service.people;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
+import org.mindrot.bcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.mindrot.bcrypt.BCrypt;
 
+import Talan.DTO.EstimateDTO;
+import Talan.DTO.MyPageDTO;
+import Talan.DTO.PaymentDTO;
 import Talan.DTO.PeopleDTO;
+import Talan.DTO.RequestDTO;
 
 @Service
 public class PeopleService {
@@ -193,7 +197,7 @@ public class PeopleService {
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         TransactionStatus status = transactionManager_sample.getTransaction(def);
-
+        param.replace("password", bCrypt.hashpw(param.get("password").toString(), bCrypt.gensalt()));
         int result = 0;
         try{
         	result = sqlSession.update("people.changePWD", param);
@@ -235,6 +239,37 @@ public class PeopleService {
 		else {
 			return 0;
 		}
+	}
+
+	// 마이페이지
+	public MyPageDTO myPage(Map<String, Object> param) {
+		MyPageDTO dto = new MyPageDTO();
+		PaymentDTO payment = sqlSession.selectOne("mypage.getLastPayment", param);
+		EstimateDTO estimateDTO = sqlSession.selectOne("estimate.getEstimate", payment.getEstimateNumber());
+		PeopleDTO peopleDTO = sqlSession.selectOne("people.getPeopleInfo", param);
+		String lastPayment = new String();
+		
+		if (param.get("isPro").toString() == "1") {
+			lastPayment = estimateDTO.getEstimateTitle();
+		} else {
+			RequestDTO requestDTO = sqlSession.selectOne("request.getRequest", estimateDTO.getRequestNumber());
+			lastPayment = requestDTO.getRequestTitle();
+		}
+		
+		dto.setStoreImageName(peopleDTO.getStoreImageName());
+		dto.setOriginImageName(peopleDTO.getOriginImageName());
+		dto.setImagePath(peopleDTO.getImagePath());
+		dto.setNickname(peopleDTO.getNickname());
+		dto.setIntro(peopleDTO.getIntro());
+		dto.setPayment(lastPayment);
+		dto.setEstimate(sqlSession.selectOne("mypage.getLastEstimate", param));
+		dto.setRequest(sqlSession.selectOne("mypage.getLastRequest", param));
+		dto.setReport(sqlSession.selectOne("mypage.getLastReport", param));
+		dto.setReview(sqlSession.selectOne("mypage.getLastReview",param));
+		dto.setInquiry(sqlSession.selectOne("mypage.getLastInquiry",param));
+
+		
+		return dto;
 	}
 
 	

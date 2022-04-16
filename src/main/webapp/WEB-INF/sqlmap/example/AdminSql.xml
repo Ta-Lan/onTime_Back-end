@@ -13,5 +13,10 @@
 	<select id="loginAdmin" parameterType="map" resultType="Talan.DTO.AdminDTO">
 		SELECT * FROM ADMIN WHERE ADMIN_ID = #{peopleId}
 	</select>
-
+	
+	<delete id="banishPeople">
+		DELETE FROM PEOPLE
+		WHERE PEOPLE_ID = #{reportTarget}
+	</delete>
+	
 </mapper>

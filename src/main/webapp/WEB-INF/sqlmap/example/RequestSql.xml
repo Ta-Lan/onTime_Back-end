@@ -93,7 +93,7 @@
         </if>
 	</select>
 	
-	<update id="setRequestClosed">
+	<update id="setRequestClosed" parameterType="map">
 		UPDATE REQUEST
 		SET REQUEST_STATUS = 1
 		WHERE REQUEST_NUMBER = #{requestNumber}
@@ -102,5 +102,9 @@
 	<select id="getRequest" parameterType="map" resultType="Talan.DTO.RequestDTO">
 		SELECT * FROM REQUEST WHERE REQUEST_NUMBER = #{requestNumber}
 	</select>
+	
+	<delete id="deleteRequest">
+		DELETE FROM REQUEST WHERE REQUEST_NUMBER = #{requestNumber}
+	</delete>
 	
 </mapper>

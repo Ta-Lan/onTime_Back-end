@@ -32,6 +32,10 @@
 		AND E.REQUEST_NUMBER = #{requestNumber}
 	</select>
 	
+	<select id="getEstimateMyList" parameterType="map" resultType="Talan.DTO.EstimateDTO">
+		SELECT * FROM ESTIMATE WHERE PRO_ID = #{proId}
+	</select>
+	
 	<update id="setEstimateMatched">
 		UPDATE ESTIMATE
 		SET ESTIMATE_STATUS = 1

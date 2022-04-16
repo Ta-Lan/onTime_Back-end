@@ -19,26 +19,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import Talan.DTO.PeopleDTO;
-import Talan.DTO.ProDTO;
-import Talan.service.pro.ProService;
+import Talan.DTO.ReportDTO;
+import Talan.service.report.ReportService;
 import kr.msp.constant.Const;
 
 @Controller
-public class ProController {
+public class ReportController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired(required = true)
-	private ProService service;
-	
-	@Autowired(required = true)
 	@Qualifier("sqlSession_sample")
 	private SqlSession sqlSession;
 
-	// PRO 등록
-	@RequestMapping(method = RequestMethod.POST, value = "/api/pro/regist")
-	public ModelAndView registPro(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+	@Autowired(required = true)
+	private ReportService service;
+
+	// 신고하기
+	@RequestMapping(method = RequestMethod.POST, value = "/api/report/regist")
+	public ModelAndView reportRegist(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -54,12 +53,11 @@ public class ProController {
 		if (session.getAttribute("user") != null) {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
-			reqBodyMap.put("proId", user.get("loginId"));
-			reqBodyMap.put("kindScore", 0);
+			reqBodyMap.put("reportPeople", user.get("loginId"));
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-			int result = service.registPro(reqBodyMap);
+			int result = service.resportRegist(reqBodyMap);
 
 			if (result > 0) {
 				responseBodyMap.put("rsltCode", "0000");
@@ -80,9 +78,9 @@ public class ProController {
 		return mv;
 	}
 
-	// PRO 조회
-	@RequestMapping(method = RequestMethod.POST, value = "/api/pro/info")
-	public ModelAndView getpeopleInfo(HttpServletRequest request, HttpServletResponse response) {
+	// 신고 내역
+	@RequestMapping(method = RequestMethod.POST, value = "/api/report/myList")
+	public ModelAndView reportMyList(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -95,26 +93,17 @@ public class ProController {
 		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+		reqBodyMap.put("peopleId", user.get("loginId"));
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		ProDTO info = service.getProInfo(reqBodyMap);
-		PeopleDTO people = sqlSession.selectOne("people.getPeopleInfo", info.getProId());
+		List<Object> list = service.reportMyList(reqBodyMap);
 
-		if (!StringUtils.isEmpty(info)) {
+		if (!StringUtils.isEmpty(list)) {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
-			responseBodyMap.put("proId", info.getProId());
-			responseBodyMap.put("category", info.getCategory());
-			responseBodyMap.put("license", info.getLicense());
-			responseBodyMap.put("content", info.getContent());
-			responseBodyMap.put("experiencePeriod", info.getExperiencePeriod());
-			responseBodyMap.put("kindScore", info.getKindScore());
-			responseBodyMap.put("reviewCount", sqlSession.selectOne("review.getReviewCount", info.getProId()));
-			responseBodyMap.put("storeImageName", people.getStoreImageName());
-			responseBodyMap.put("originImageName", people.getOriginImageName());
-			responseBodyMap.put("imagePath", people.getImagePath());
-			responseBodyMap.put("nickname", people.getNickname());
-			responseBodyMap.put("intro", people.getIntro());
+			responseBodyMap.put("list", list);
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
@@ -127,9 +116,9 @@ public class ProController {
 		return mv;
 	}
 
-	// 자격증 검색
-	@RequestMapping(method = RequestMethod.POST, value = "/api/pro/searchLicense")
-	public ModelAndView searchLicense(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+	// 신고 상세 내역
+	@RequestMapping(method = RequestMethod.POST, value = "/api/report/detail")
+	public ModelAndView reviewDetail(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -141,18 +130,29 @@ public class ProController {
 
 		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
-
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+		if (user.get("loginId").toString().equals("admin")) {
 
-		List<Object> list = service.searchLicense(reqBodyMap);
-		
-		if (!StringUtils.isEmpty(list)) {
-			responseBodyMap.put("rsltCode", "0000");
-			responseBodyMap.put("rsltMsg", "Success");
-			responseBodyMap.put("licenseList", list);
+			ReportDTO report = service.reportDetail(reqBodyMap);
+
+			if (!StringUtils.isEmpty(report)) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+				responseBodyMap.put("reportNumber", report.getReportNumber());
+				responseBodyMap.put("reportPeople", report.getReportPeople());
+				responseBodyMap.put("reportTarget", report.getReportTarget());
+				responseBodyMap.put("reportDate", report.getReportDate());
+				responseBodyMap.put("reportContent", report.getReportContent());
+				responseBodyMap.put("reportCode", report.getReportCode());
+				responseBodyMap.put("reportStatus", report.getReportStatus());
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
 		} else {
-			responseBodyMap.put("rsltCode", "2003");
-			responseBodyMap.put("rsltMsg", "Data not found.");
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login Admin required.");
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");

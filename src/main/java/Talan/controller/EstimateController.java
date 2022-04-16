@@ -77,6 +77,50 @@ public class EstimateController {
 		return mv;
 	}
 
+	// 내가 보낸 견적서 리스트
+	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/myList")
+	public ModelAndView estimateMyList(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		if (session.getAttribute("user") != null) {
+
+			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+			reqBodyMap.put("proId", user.get("loginId"));
+			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+			List<Object> list = service.estimateMyList(reqBodyMap);
+
+			if (!StringUtils.isEmpty(list)) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+				responseBodyMap.put("list", list);
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
+		} else if (session.getAttribute("user") == null) {
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login required.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
 	// 견적서 리스트
 	@RequestMapping(method = RequestMethod.POST, value = "/api/estimate/list")
 	public ModelAndView estimateList(HttpServletRequest request, HttpServletResponse response) {
