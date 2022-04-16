@@ -59,6 +59,10 @@
 		AND PRO_ID = #{proId}
 	</delete>
 	
+	<delete id="adminDeleteFeed">
+		DELETE FROM FEED WHERE FEED_NUMBER = #{feedNumber}
+	</delete>
+	
 	<delete id="deleteFeedComments">
 		DELETE FROM FEED_COMMENTS WHERE FEED_NUMBER = #{feedNumber}
 	</delete>

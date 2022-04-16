@@ -20,6 +20,7 @@ import Talan.DTO.EstimateDTO;
 import Talan.DTO.EstimateListDTO;
 import Talan.DTO.PeopleDTO;
 import Talan.DTO.RequestDTO;
+import Talan.DTO.ReviewDTO;
 import Talan.service.MessageService;
 
 @Service
@@ -61,12 +62,30 @@ public class EstimateService {
 		}
 		return result;
 	}
+	
+	// 내가 보낸 견적서 조회
+	public List<Object> estimateMyList(Map<String, Object> param) {
+		List<EstimateDTO> estimate = new ArrayList<EstimateDTO>();
+
+		estimate = sqlSession.selectList("estimate.getEstimateMyList", param);
+
+		List<Object> list = new ArrayList<Object>();
+		for (int i = 0; i < estimate.size(); i++) {
+			Map<String, Object> preList = new HashMap<String, Object>();
+			RequestDTO request = new RequestDTO();
+			
+			request = sqlSession.selectOne("request.getRequest", estimate.get(i).getRequestNumber());
+			
+			preList.put("requestStatus", request.getRequestStatus());
+			preList.putAll(estimate.get(i).getEstimateList());
+			list.add(preList);
+		}
+		return list;
+	}
 
 	// 견적서 조회
 	public List<Object> estimateList(Map<String, Object> param) {
-
 		List<EstimateListDTO> estimate = sqlSession.selectList("estimate.getEstimateList", param);
-
 		List<Object> list = new ArrayList<Object>();
 
 		for (int i = 0; i < estimate.size(); i++) {

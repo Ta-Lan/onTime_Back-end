@@ -94,6 +94,7 @@ public class MessageController {
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
+			responseBodyMap.put("chatNumber", chatNumber);
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");

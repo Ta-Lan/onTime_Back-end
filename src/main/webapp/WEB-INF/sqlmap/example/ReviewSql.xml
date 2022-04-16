@@ -11,13 +11,27 @@
 	</sql>
 	
 	<insert id="registReview">
-		INSERT INTO REVIEW (REVIEW_NUMBER, PAYMENT_NUMBER, PEOPLE_ID, REVIEW_TITLE, REVIEW_CONTENT, STAR_POINT, PRO_ID)
+		INSERT INTO REVIEW (REVIEW_NUMBER, PAYMENT_NUMBER, PEOPLE_ID, REVIEW_TITLE, REVIEW_CONTENT, STAR_POINT, PRO_ID, REVIEW_RESPONSE)
 		VALUES
-		( (<include refid="setReviewNumber"/>), #{paymentNumber}, #{peopleId}, #{reviewTitle}, #{reviewContent}, #{starPoint}, #{proId} )
+		( (<include refid="setReviewNumber"/>), #{paymentNumber}, #{peopleId}, #{reviewTitle}, #{reviewContent}, #{starPoint}, #{proId}, '아직 프로가 답변하지 않은 리뷰입니다.')
 	</insert>
 	
-	<select id="getProPoint" parameterType="map" resultType="map">
-		select COUNT(*) review_count, AVG(STAR_POINT) kind_score FROM REVIEW WHERE PRO_ID = #{proId}
+	<select id="getReviewCount" parameterType="map" resultType="String">
+		SELECT COUNT(*) REVIEW_COUNT FROM REVIEW WHERE PRO_ID = #{proId}
 	</select>
 
+	<update id="responseReview">
+		UPDATE REVIEW
+		SET REVIEW_RESPONSE = #{reviewResponse}
+		WHERE PRO_ID = #{proId} AND REVIEW_NUMBER = #{reviewNumber}
+	</update>
+	
+	<select id="getReviewList" parameterType="map" resultType="Talan.DTO.ReviewDTO">
+		SELECT * FROM REVIEW WHERE PRO_ID = #{proId}
+	</select>
+	
+	<select id="getReview" parameterType="map" resultType="Talan.DTO.ReviewDTO">
+		SELECT * FROM REVIEW WHERE REVIEW_NUMBER = #{reviewNumber}
+	</select>
+	
 </mapper>

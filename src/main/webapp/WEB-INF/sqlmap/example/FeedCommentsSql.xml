@@ -22,7 +22,11 @@
 	</select>
 	
 	<delete id="deleteFeedComment">
+		<if test="peopleId == 'admin'">
+			DELETE FROM FEED_COMMENTS WHERE FEED_COMMENTS_NUMBER = #{feedCommentsNumber}
+		</if>
 		DELETE FROM FEED_COMMENTS WHERE FEED_COMMENTS_NUMBER = #{feedCommentsNumber} AND PEOPLE_ID = #{peopleId}
+
 	</delete>
 	
 </mapper>

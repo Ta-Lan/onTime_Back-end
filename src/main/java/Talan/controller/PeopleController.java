@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import Talan.DTO.AdminDTO;
+import Talan.DTO.MyPageDTO;
 import Talan.DTO.PeopleDTO;
 import Talan.service.admin.AdminService;
 import Talan.service.people.PeopleService;
@@ -363,6 +364,8 @@ public class PeopleController {
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
+		Map<String, String> user = new HashMap<String, String>();
+
 		if (reqBodyMap.get("peopleId").toString().equals("admin")) {
 			int result = adminService.loginAdmin(reqBodyMap);
 			if (result == 1) {
@@ -370,7 +373,9 @@ public class PeopleController {
 				responseBodyMap.put("rsltCode", "0000");
 				responseBodyMap.put("rsltMsg", "Success");
 				responseBodyMap.put("session", DTO);
-				session.setAttribute("loginId", reqBodyMap.get("peopleId"));
+				user.put("loginId", DTO.getAdminId());
+				user.put("password", DTO.getAdminPassword());
+				session.setAttribute("user", user);
 			} else if (result == -1) {
 				responseBodyMap.put("rsltCode", "2001");
 				responseBodyMap.put("rsltMsg", "ID or PWD not correct");
@@ -379,9 +384,6 @@ public class PeopleController {
 				responseBodyMap.put("rsltMsg", "Data not found.");
 			}
 		} else {
-
-			Map<String, String> user = new HashMap<String, String>();
-
 			PeopleDTO DTO = sqlSession.selectOne("people.getSession", reqBodyMap);
 
 			int result = service.loginPeople(reqBodyMap);
@@ -650,6 +652,51 @@ public class PeopleController {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
 			responseBodyMap.put("existYn", "N");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
+	// 마이 페이지
+	@RequestMapping(method = RequestMethod.POST, value = "/api/people/myPage")
+	public ModelAndView myPage(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+		reqBodyMap.put("peopleId", user.get("loginId"));
+		reqBodyMap.put("isPro", proService.isProRegisted(user.get("loginId").toString()));
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+		if (session.getAttribute("user") != null) {
+			MyPageDTO dto = service.myPage(reqBodyMap);
+
+			if (!StringUtils.isEmpty(dto)) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+				responseBodyMap.putAll(dto.getMyPage());
+
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
+		} else {
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login required.");
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");

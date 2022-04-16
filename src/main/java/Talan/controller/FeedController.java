@@ -461,7 +461,6 @@ public class FeedController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
 		if (session.getAttribute("user") != null) {
-
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
 			reqBodyMap.put("proId", user.get("loginId"));

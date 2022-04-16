@@ -1,5 +1,11 @@
 package Talan.DTO;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ReviewDTO {
 	private String reviewNumber;
 	private String paymentNumber;
@@ -9,6 +15,21 @@ public class ReviewDTO {
 	private Integer starPoint;
 	private String proId;
 	private String reviewResponse;
+	private Date reviewDate;
+	
+	public Map<String, Object> getReviewList() {
+		Map<String, Object> review = new HashMap<String, Object>();
+			review.put("paymentNumber", reviewNumber);
+			review.put("paymentNumber", paymentNumber);
+			review.put("peopleId", peopleId);
+			review.put("reviewTitle", reviewTitle);
+			review.put("reviewContent", reviewContent);
+			review.put("starPoint", starPoint);
+			review.put("proId", proId);
+			review.put("reviewResponse", reviewResponse);
+			review.put("reviewDate", getReviewDate());
+		return review;
+	}
 	
 	public String getReviewNumber() {
 		return reviewNumber;
@@ -57,6 +78,16 @@ public class ReviewDTO {
 	}
 	public void setReviewResponse(String reviewResponse) {
 		this.reviewResponse = reviewResponse;
+	}
+
+	public String getReviewDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.");
+		String strReviewDate = dateFormat.format(reviewDate);
+		return strReviewDate;
+	}
+
+	public void setReviewDate(Date reviewDate) {
+		this.reviewDate = reviewDate;
 	}
 	
 }
