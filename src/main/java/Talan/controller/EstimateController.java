@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import Talan.DTO.EstimateDTO;
+import Talan.DTO.ProDTO;
 import Talan.service.estimate.EstimateService;
 import kr.msp.constant.Const;
 
@@ -174,6 +175,7 @@ public class EstimateController {
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 		EstimateDTO estimateDTO = service.detailEstimate(reqBodyMap);
+		ProDTO pro = sqlSession.selectOne("pro.getProInfo", estimateDTO.getProId());
 
 		if (!StringUtils.isEmpty(estimateDTO)) {
 			responseBodyMap.put("rsltCode", "0000");

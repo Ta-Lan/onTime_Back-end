@@ -268,6 +268,97 @@ public class PeopleController {
 		return mv;
 	}
 
+	// 프로필 사진 변경
+	@RequestMapping(method = RequestMethod.POST, value = "/api/people/updateProfileImage")
+		public ModelAndView updateProfileImage(MultipartHttpServletRequest request, HttpServletResponse response,
+				HttpSession session) {
+
+			Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+			Map<String, Object> reqBodyMap = new HashMap<String, Object>();
+			Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+			if (reqHeadMap == null) {
+				reqHeadMap = new HashMap<String, Object>();
+			}
+
+			reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+			reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+			if (session.getAttribute("user") != null) {
+				Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+				reqBodyMap.put("peopleId", user.get("loginId"));
+				
+				System.out.println("BODY ::::::::: " + reqBodyMap);
+
+				//////////////////////////// IMAGE UPLOAD////////////////////////////
+				
+				InetAddress addr = null;
+				try {
+					addr = InetAddress.getLocalHost();
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				}
+				String ip = addr.getHostAddress();
+				String http = "http://";
+				String port = ":8888";
+				String server = http + ip + port;
+
+				String fileDir = "/image/profileImage/";
+				String filePath = request.getServletContext().getRealPath(fileDir);
+				System.out.println(filePath);
+				MultipartFile image = request.getFile("image");
+				String originalFile = image.getOriginalFilename();
+
+				// .png
+				String extension = originalFile.substring(originalFile.lastIndexOf("."));
+
+				// 7b2582aca35e4525b4a579d84e8b6c9d
+				String storeName = UUID.randomUUID().toString().replace("-", "");
+
+				String storeFileName = storeName + extension;
+
+				File file = new File(filePath + storeFileName);
+				try {
+					image.transferTo(file); // 파일을 저장
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				reqBodyMap.put("storeImageName", storeFileName);
+				reqBodyMap.put("originImageName", originalFile);
+				reqBodyMap.put("imagePath", server + fileDir);
+
+				//////////////////////////// IMAGE UPLOAD////////////////////////////
+
+				logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+				/*
+				 * body에 들어가는 값은 proId, feedNumber, feedTitle, feedContent proId는 세션으로 미리 put
+				 * 해주었고, feedNumber는 프론트에서 버튼 처리할 때 data.param으로 넘겨주도록 합시다.
+				 */
+
+				int result = service.updateProfileImage(reqBodyMap);
+
+				if (result > 0) {
+					responseBodyMap.put("rsltCode", "0000");
+					responseBodyMap.put("rsltMsg", "Success");
+				} else {
+					responseBodyMap.put("rsltCode", "2003");
+					responseBodyMap.put("rsltMsg", "Data not found.");
+				}
+			} else if (session.getAttribute("user") == null) {
+				responseBodyMap.put("rsltCode", "1003");
+				responseBodyMap.put("rsltMsg", "Login required.");
+			}
+
+			ModelAndView mv = new ModelAndView("defaultJsonView");
+			mv.addObject(Const.HEAD, reqHeadMap);
+			mv.addObject(Const.BODY, responseBodyMap);
+
+			return mv;
+		}
+
 	// 내 소개 수정
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/updateIntro")
 	public ModelAndView updateIntro(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
@@ -384,7 +475,7 @@ public class PeopleController {
 				responseBodyMap.put("rsltMsg", "Data not found.");
 			}
 		} else {
-			PeopleDTO DTO = sqlSession.selectOne("people.getSession", reqBodyMap);
+			PeopleDTO DTO = sqlSession.selectOne("people.getPeopleInfo", reqBodyMap);
 
 			int result = service.loginPeople(reqBodyMap);
 			int proRegisted = proService.isProRegisted(DTO.getPeopleId());

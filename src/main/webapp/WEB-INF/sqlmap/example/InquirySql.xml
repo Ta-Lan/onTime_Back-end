@@ -74,11 +74,15 @@
 	
 	<update id="setInquiryStatus">
 		UPDATE INQUIRY
-		SET INQUIRY_STATUS = 1
+		SET RESPONSE_STATUS = 1
 		WHERE INQUIRY_NUMBER = #{inquiryNumber}
 	</update>
 	
-	<delete id="deleteInquiry">
+	<delete id="deleteInquiryAdmin">
 		DELETE FROM INQUIRY WHERE INQUIRY_NUMBER = #{inquiryNumber}
+	</delete>
+	
+	<delete id="deleteInquiry">
+		DELETE FROM INQUIRY WHERE INQUIRY_NUMBER = #{inquiryNumber} AND PEOPLE_ID = #{peopleId}
 	</delete>
 </mapper>

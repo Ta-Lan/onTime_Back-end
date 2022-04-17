@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import Talan.DTO.PeopleDTO;
-import Talan.DTO.ReportDTO;
 import Talan.service.admin.AdminService;
 import kr.msp.constant.Const;
 
@@ -199,6 +197,46 @@ public class AdminController {
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
+	// 리뷰 숨기기
+	@RequestMapping(method = RequestMethod.POST, value = "/api/admin/reviewDelete")
+	public ModelAndView deleteReview(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+		Map<String, String> user = (Map<String, String>) session.getAttribute("user");
+		if (user.get("loginId").toString().equals("admin")) {
+
+			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+			int result = service.deleteReview(reqBodyMap);
+
+			if (result > 0) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
+		} else if (session.getAttribute("user") == null) {
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login required.");
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");

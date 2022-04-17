@@ -1,5 +1,7 @@
 package Talan.DTO;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ResponseDTO {
@@ -35,14 +37,18 @@ public class ResponseDTO {
 	public void setResponseContent(String responseContent) {
 		this.responseContent = responseContent;
 	}
-	public Date getResponseRegisterDate() {
-		return responseRegisterDate;
+	public String getResponseRegisterDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strResponseRegisterDate = dateFormat.format(responseRegisterDate);
+		return strResponseRegisterDate;
 	}
 	public void setResponseRegisterDate(Date responseRegisterDate) {
 		this.responseRegisterDate = responseRegisterDate;
 	}
-	public Date getResponseModifyDate() {
-		return responseModifyDate;
+	public String getResponseModifyDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd. HH:mm");
+		String strResponseModifyDate = dateFormat.format(responseModifyDate);
+		return strResponseModifyDate;
 	}
 	public void setResponseModifyDate(Date responseModifyDate) {
 		this.responseModifyDate = responseModifyDate;

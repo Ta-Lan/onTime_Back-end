@@ -140,6 +140,8 @@ public class FeedService {
 
 		int cnt = Integer.parseInt(param.get("cnt").toString()) - 1;
 
+		
+		
 		List<Object> list = new ArrayList<Object>();
 		for (int i = 0; i <= cnt; i++) {
 			list.add(feed.get(i).getFeedList());

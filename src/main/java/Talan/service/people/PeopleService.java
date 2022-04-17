@@ -162,7 +162,7 @@ public class PeopleService {
 	public int loginPeople(Map<String, Object> param) {
         int result = 0;
         try{        
-        	PeopleDTO info = sqlSession.selectOne("people.getSession", param);
+        	PeopleDTO info = sqlSession.selectOne("people.getPeopleInfo", param);
         	if( bCrypt.checkpw(param.get("password").toString(), info.getPassword()) ) {
         		result = 1;
         	}
@@ -270,6 +270,29 @@ public class PeopleService {
 
 		
 		return dto;
+	}
+
+	// 프로필 사진 변경
+	public int updateProfileImage(Map<String, Object> param) {
+		//트랜잭션 구현
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager_sample.getTransaction(def);
+        
+        int result = 0;
+        try{
+           
+            result = sqlSession.update("people.updateProfileImage", param);
+            
+            transactionManager_sample.commit(status);
+            logger.info("========== 프로필 사진 변경 완료 : {}", result);
+            
+        }catch(Exception e){
+        	logger.error("[ERROR] insertPeople() Fail : e : {}", e.getMessage());
+        	e.printStackTrace();
+        	transactionManager_sample.rollback(status);    	
+        }
+		return result;
 	}
 
 	
