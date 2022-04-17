@@ -47,12 +47,6 @@
 		WHERE  PEOPLE_ID = #{peopleId}
 	</delete>
 	
-	<select id="getSession" parameterType="map" resultType="Talan.DTO.PeopleDTO">
-		SELECT *
-		FROM PEOPLE
-		WHERE PEOPLE_ID = #{peopleId}
-	</select>
-	
 	<select id="findId" parameterType="map" resultType="string">
 		SELECT PEOPLE_ID
 		FROM PEOPLE
@@ -89,6 +83,13 @@
 		WHERE NICKNAME = #{nickname}
 	</select>
 	
+	<update id="updateProfileImage">
+		UPDATE PEOPLE
+		SET STORE_IMAGE_NAME = #{storeImageName},
+			ORIGIN_IMAGE_NAME = #{originImageName},
+			IMAGE_PATH = #{imagePath}
+		WHERE PEOPLE_ID = #{peopleId}
+	</update>
 
 	
 </mapper>

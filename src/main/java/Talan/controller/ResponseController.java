@@ -1,7 +1,6 @@
 package Talan.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import Talan.DTO.InquiryDTO;
+import Talan.DTO.ResponseDTO;
 import Talan.service.response.ResponseService;
 import kr.msp.constant.Const;
 
@@ -48,9 +47,15 @@ public class ResponseController {
 
 		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+		
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+		
+		reqBodyMap.put("adminId", user.get("loginId"));
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
+		
+		if (user.get("loginId").toString().equals("admin")) {
 		int result = service.registResponse(reqBodyMap);
 
 		if (result > 0) {
@@ -59,6 +64,10 @@ public class ResponseController {
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
+		}
+		} else {
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login Admin required.");
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");
@@ -85,11 +94,18 @@ public class ResponseController {
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
-		int result = service.responseInfo(reqBodyMap);
+		ResponseDTO responseDTO = service.responseInfo(reqBodyMap);
 
-		if (result > 0) {
+		if (!StringUtils.isEmpty(responseDTO)) {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
+			responseBodyMap.put("responseNumber", responseDTO.getResponseNumber());
+			responseBodyMap.put("adminId", responseDTO.getAdminId());
+			responseBodyMap.put("reponseTitle", responseDTO.getResponseTitle());
+			responseBodyMap.put("responseContent", responseDTO.getResponseContent());
+			responseBodyMap.put("responseModifyDate", responseDTO.getResponseModifyDate());
+			responseBodyMap.put("responseRegisterDate", responseDTO.getResponseRegisterDate());
+			responseBodyMap.put("inquiryNumber", responseDTO.getInquiryNumber());
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");

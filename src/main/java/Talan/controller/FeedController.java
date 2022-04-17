@@ -206,9 +206,20 @@ public class FeedController {
 		lastFeed = (Map<String, Object>) list.get(Integer.parseInt(reqBodyMap.get("cnt").toString()) - 1);
 
 		if (!StringUtils.isEmpty(list)) {
+			Map<String, Object> popularFeed = new HashMap<String, Object>();
+			popularFeed.put("feedNumber", sqlSession.selectOne("feedComments.getPopularFeed"));
+			FeedDTO dto = sqlSession.selectOne("feed.getFeed", popularFeed);
+			popularFeed.put("feedTitle", dto.getFeedTitle());
+			popularFeed.put("feedContent", dto.getFeedContent());
+			popularFeed.put("commentsCount", sqlSession.selectOne("feedComments.getCommentsCount", popularFeed));
+			popularFeed.put("storeFileName", dto.getStoreFileName());
+			popularFeed.put("originFileName", dto.getOriginFileName());
+			popularFeed.put("filePath", dto.getFilePath());
+
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
 			responseBodyMap.put("lastFeedNumber", lastFeed.get("feedNumber"));
+			responseBodyMap.put("popularFeed", popularFeed);
 			responseBodyMap.put("list", list);
 		} else {
 			responseBodyMap.put("rsltCode", "2003");

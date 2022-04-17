@@ -18,9 +18,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import Talan.DTO.EstimateDTO;
 import Talan.DTO.EstimateListDTO;
-import Talan.DTO.PeopleDTO;
+import Talan.DTO.ProDTO;
 import Talan.DTO.RequestDTO;
-import Talan.DTO.ReviewDTO;
 import Talan.service.MessageService;
 
 @Service
@@ -83,13 +82,22 @@ public class EstimateService {
 		return list;
 	}
 
-	// 견적서 조회
+	// 견적서 리스트 조회
 	public List<Object> estimateList(Map<String, Object> param) {
 		List<EstimateListDTO> estimate = sqlSession.selectList("estimate.getEstimateList", param);
 		List<Object> list = new ArrayList<Object>();
-
+		Map<String, Object> proInfo = new HashMap<String, Object>();
 		for (int i = 0; i < estimate.size(); i++) {
-			list.add(estimate.get(i).getEstimateList());
+			Map<String, Object> preList = new HashMap<String, Object>();
+			ProDTO pro = new ProDTO();
+			String reviewCount = new String();
+			pro = sqlSession.selectOne("pro.getProInfo", estimate.get(i).getProId());
+			reviewCount = sqlSession.selectOne("review.getReviewCount", pro.getProId());
+			proInfo.put("kindScore", pro.getKindScore());
+			proInfo.put("reviewCount", reviewCount);
+			preList.putAll(proInfo);;
+			preList.putAll(estimate.get(i).getEstimateList());
+			list.add(preList);
 		}
 		return list;
 	}

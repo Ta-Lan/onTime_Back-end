@@ -35,7 +35,7 @@ public class AdminService {
 	@Autowired(required = true)
 	@Qualifier("bCrypt")
 	private BCrypt bCrypt;
-
+	
 	public int registAdmin(Map<String, Object> param) {
 		// 트랜잭션 구현
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -76,7 +76,7 @@ public class AdminService {
 		}
 		return result;
 	}
-	
+
 	// 신고 리스트
 	public List<Object> reportList(Map<String, Object> param) {
 		List<ReportDTO> report = new ArrayList<ReportDTO>();
@@ -99,7 +99,7 @@ public class AdminService {
 
 		int result = 0;
 		try {
-			result = sqlSession.update("inquiry.deleteInquiry", param);
+			result = sqlSession.update("inquiry.deleteInquiryAdmin", param);
 			transactionManager_sample.commit(status);
 			logger.info("========== 문의 삭제 완료 : {}", result);
 
@@ -132,6 +132,7 @@ public class AdminService {
 		return result;
 	}
 
+	// 신고처리
 	public int reportProcess(Map<String, Object> param) {
 		// 트랜잭션 구현
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -141,8 +142,8 @@ public class AdminService {
 		int result = 0;
 		try {
 			result = sqlSession.update("report.reportProcess", param);
-			if(result == 1 && param.get("reportStatus").toString().equals("1")) {
-				sqlSession.delete("admin.banishPeople");
+			if (result == 1 && param.get("reportStatus").toString().equals("1")) {
+				sqlSession.delete("admin.banishPeople", param);
 			}
 			transactionManager_sample.commit(status);
 			logger.info("========== 신고 처리 완료 : {}", result);
@@ -154,4 +155,29 @@ public class AdminService {
 		}
 		return result;
 	}
+
+	// 리뷰 숨기기
+	public int deleteReview(Map<String, Object> param) {
+		// 트랜잭션 구현
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager_sample.getTransaction(def);
+
+		int result = 0;
+		try {
+			result = sqlSession.delete("admin.deleteReview", param);
+			if (result == 1) {
+				sqlSession.update("admin.updateProKindScore", param);
+			}
+			transactionManager_sample.commit(status);
+			logger.info("========== 신고 처리 완료 : {}", result);
+
+		} catch (Exception e) {
+			logger.error("[ERROR] deleteInquiry() Fail : e : {}", e.getMessage());
+			e.printStackTrace();
+			transactionManager_sample.rollback(status);
+		}
+		return result;
+	}
+
 }

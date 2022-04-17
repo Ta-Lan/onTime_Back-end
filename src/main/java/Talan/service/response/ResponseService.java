@@ -13,6 +13,8 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import Talan.DTO.ResponseDTO;
+
 @Service
 public class ResponseService {
 
@@ -36,7 +38,7 @@ public class ResponseService {
 		int result = 0;
 		try {
 			result = sqlSession.insert("response.registResponse", param);
-			sqlSession.update("inquiry.inquiryStatus", param);
+			sqlSession.update("inquiry.setInquiryStatus", param);
 			transactionManager_sample.commit(status);
 			logger.info("========== 답변 등록 완료 : {}", result);
 		} catch (Exception e) {
@@ -47,12 +49,17 @@ public class ResponseService {
 		return result;
 	}
 
-	public int responseInfo(Map<String, Object> reqBodyMap) {
-		// TODO Auto-generated method stub
-		return 0;
+	// 답변 조회
+	public ResponseDTO responseInfo(Map<String, Object> param) {
+		ResponseDTO response = new ResponseDTO();
+		response = sqlSession.selectOne("response.getResponse", param);
+		return response;
 	}
+
 	
-	//답변 조회
+	
+	
+	
 	
 
 }

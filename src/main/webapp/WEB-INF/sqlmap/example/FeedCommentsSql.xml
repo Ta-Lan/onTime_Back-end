@@ -29,4 +29,18 @@
 
 	</delete>
 	
+	<select id="getPopularFeed" resultType="String">
+		SELECT FEED_NUMBER 
+		FROM (SELECT ROWNUM, FEED_NUMBER 
+				FROM (SELECT FEED_NUMBER, COUNT(FEED_NUMBER)
+			     	  FROM FEED_COMMENTS 
+					  GROUP BY(FEED_NUMBER) 
+					  ORDER BY COUNT(FEED_NUMBER) DESC)
+				WHERE ROWNUM = 1)
+	</select>
+	
+	<select id="getCommentsCount" parameterType="map" resultType="Integer">
+		SELECT COUNT(FEED_NUMBER) FROM FEED_COMMENTS WHERE FEED_NUMBER = #{feedNumber}
+	</select>
+	
 </mapper>

@@ -211,6 +211,7 @@ public class PaymentController {
 				responseBodyMap.put("requestTitle", dto.getRequestTitle());
 				responseBodyMap.put("requestContent", dto.getRequestContent());
 				responseBodyMap.put("nickname", dto.getNickname());
+				responseBodyMap.put("reviewStatus", dto.getReviewStatus());
 			} else {
 				responseBodyMap.put("rsltCode", "2003");
 				responseBodyMap.put("rsltMsg", "Data not found.");

@@ -17,6 +17,7 @@ public class PaymentDTO {
 	private String progressiveStatus;
 	private String peopleId;
 	private String proId;
+	private Character reviewStatus;
 	
 	private Map<String, String> paymentTypeList = new HashMap<String, String>() {
 		{
@@ -38,10 +39,21 @@ public class PaymentDTO {
 		payment.put("progressiveStatus", progressiveStatus);
 		payment.put("peopleId", peopleId);
 		payment.put("proId", proId);
-		
+		payment.put("reviewStatus", reviewStatus);
 		return payment;
 	}
 	
+	
+	public Character getReviewStatus() {
+		return reviewStatus;
+	}
+
+
+	public void setReviewStatus(Character reviewStatus) {
+		this.reviewStatus = reviewStatus;
+	}
+
+
 	public String getPeopleId() {
 		return peopleId;
 	}

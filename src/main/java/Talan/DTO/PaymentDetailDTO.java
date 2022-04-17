@@ -7,20 +7,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PaymentDetailDTO {
-	String paymentNumber;
-	Integer paymentPrice;
-	Date paymentDate;
-	Date paymentCancelDate;
-	String paymentType;
-	String progressiveStatus;
-	String estimateNumber;
-	String estimateTitle;
-	String estimateContent;
-	String requestTitle;
-	String requestContent;
-	String nickname;
-	String proId;
-	
+	private String paymentNumber;
+	private Integer paymentPrice;
+	private Date paymentDate;
+	private Date paymentCancelDate;
+	private String paymentType;
+	private String progressiveStatus;
+	private String estimateNumber;
+	private String estimateTitle;
+	private String estimateContent;
+	private String requestTitle;
+	private String requestContent;
+	private String nickname;
+	private String proId;
+	private Character reviewStatus;
+
+	public Character getReviewStatus() {
+		return reviewStatus;
+	}
+
+	public void setReviewStatus(Character reviewStatus) {
+		this.reviewStatus = reviewStatus;
+	}
+
+	public void setPaymentPrice(Integer paymentPrice) {
+		this.paymentPrice = paymentPrice;
+	}
+
 	public String getPaymentNumber() {
 		return paymentNumber;
 	}

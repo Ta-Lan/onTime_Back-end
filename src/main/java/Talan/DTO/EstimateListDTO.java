@@ -35,8 +35,8 @@ public class EstimateListDTO {
 		}
 	};
 	
-	public Map<String, String> getEstimateList() {
-		Map<String, String> estimateList = new HashMap<String, String>();
+	public Map<String, Object> getEstimateList() {
+		Map<String, Object> estimateList = new HashMap<String, Object>();
 		
 		estimateList.put("nickname", nickname);
 		estimateList.put("storeImageName", storeImageName);

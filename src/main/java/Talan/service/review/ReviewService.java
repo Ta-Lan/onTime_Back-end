@@ -33,6 +33,7 @@ public class ReviewService {
 	@Qualifier("transactionManager_sample")
 	private DataSourceTransactionManager transactionManager_sample;
 
+	// 리뷰 등록
 	public int registReview(Map<String, Object> param) {
 		//트랜잭션 구현
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -43,7 +44,9 @@ public class ReviewService {
         try{
            
             result = sqlSession.insert("review.registReview", param);
-            
+            if (result == 1) {
+            	sqlSession.update("payment.setReviewStatus", param);
+            }
             transactionManager_sample.commit(status);
             logger.info("========== 리뷰 등록 완료 : {}", result);
             
