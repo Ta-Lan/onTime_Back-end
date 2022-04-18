@@ -1,6 +1,7 @@
 package Talan.service.feed;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -194,6 +195,28 @@ public class FeedService {
 			transactionManager_sample.rollback(status);
 		}
 		return result;
+	}
+
+	// 인기 피드 가져오기
+	public List<Object> popularFeeds() {
+		List<Object> popularFeeds = new ArrayList<Object>();
+		List<String> feedNumber = new ArrayList<>();
+		feedNumber = sqlSession.selectList("feedComments.getPopularFeed");
+		System.out.println("::::::::::::::::::::"+feedNumber);
+		for (int i = 0; i < feedNumber.size(); i++) {
+			Map<String, Object> popularFeed = new HashMap<String, Object>();
+			FeedDTO dto = new FeedDTO();
+			dto = sqlSession.selectOne("feed.getFeed", feedNumber.get(i));
+			System.out.println(":::::::::::::"+feedNumber.get(i));
+			popularFeed.put("feedNumber", feedNumber.get(i));
+			popularFeed.put("feedTitle", dto.getFeedTitle());
+			popularFeed.put("commentsCount", sqlSession.selectOne("feedComments.getCommentsCount", feedNumber.get(i)));
+			popularFeed.put("storeFileName", dto.getStoreFileName());
+			popularFeed.put("originFileName", dto.getOriginFileName());
+			popularFeed.put("filePath", dto.getFilePath());
+			popularFeeds.add(i, popularFeed);
+		}
+		return popularFeeds;
 	}
 
 }
