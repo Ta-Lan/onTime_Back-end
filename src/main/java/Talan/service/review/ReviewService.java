@@ -110,4 +110,26 @@ public class ReviewService {
 		return review;
 	}
 
+	public List<Object> reviewMyList(Map<String, Object> param) {
+		List<ReviewDTO> review = new ArrayList<ReviewDTO>();
+
+		review = sqlSession.selectList("review.getReviewListPro", param);
+
+		List<Object> list = new ArrayList<Object>();
+		for (int i = 0; i < review.size(); i++) {
+			Map<String, Object> preList = new HashMap<String, Object>();
+			String peopleNickname = new String();
+			String proNickname = new String();
+			
+			peopleNickname = sqlSession.selectOne("people.getNickname", review.get(i).getPeopleId());
+			proNickname = sqlSession.selectOne("people.getNickname", review.get(i).getProId());
+			
+			preList.put("peopleNickname", peopleNickname);
+			preList.put("proNickname", proNickname);
+			preList.putAll(review.get(i).getReviewList());
+			list.add(preList);
+		}
+		return list;
+	}
+
 }

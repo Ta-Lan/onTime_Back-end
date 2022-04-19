@@ -178,7 +178,7 @@ public class FeedService {
 
 		int result = 0;
 		try {
-			if (param.get("loginId").toString().equals("admin")) {
+			if (param.get("proId").equals("admin")) {
 				result = sqlSession.delete("feed.adminDeleteFeed", param);
 			} else {
 				result = sqlSession.delete("feed.deleteFeed", param);

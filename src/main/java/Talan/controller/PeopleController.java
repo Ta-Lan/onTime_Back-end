@@ -408,7 +408,7 @@ public class PeopleController {
 
 	// 회원탈퇴
 	@RequestMapping(method = RequestMethod.POST, value = "/api/people/out")
-	public ModelAndView deletepeople(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView deletepeople(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
 		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
@@ -419,6 +419,9 @@ public class PeopleController {
 
 		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+		
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+		reqBodyMap.put("id", user.get("loginId"));
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
@@ -427,6 +430,8 @@ public class PeopleController {
 		if (result > 0) {
 			responseBodyMap.put("rsltCode", "0000");
 			responseBodyMap.put("rsltMsg", "Success");
+			session.removeAttribute("user");
+			session.invalidate();
 		} else {
 			responseBodyMap.put("rsltCode", "2003");
 			responseBodyMap.put("rsltMsg", "Data not found.");
@@ -768,7 +773,7 @@ public class PeopleController {
 
 		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
-		reqBodyMap.put("peopleId", user.get("loginId"));
+		reqBodyMap.put("id", user.get("loginId"));
 		reqBodyMap.put("isPro", proService.isProRegisted(user.get("loginId").toString()));
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());

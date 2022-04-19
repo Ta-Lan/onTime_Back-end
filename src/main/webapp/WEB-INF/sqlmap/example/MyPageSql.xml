@@ -5,25 +5,30 @@
 
 <mapper namespace="mypage">
 
-	<select id="getLastPayment" parameterType="map" resultType="Talan.DTO.PaymentDTO">
+	<select id="getLastPaymentPRO" parameterType="map" resultType="Talan.DTO.PaymentDTO">
 		SELECT PAYMENT_NUMBER, ESTIMATE_NUMBER 
 		FROM (SELECT PAYMENT_NUMBER, ESTIMATE_NUMBER, ROWNUM 
 			  FROM PAYMENT 
-			  <if test="isPro == 0">
-			  WHERE PEOPLE_ID = #{peopleId}
-			  </if>
-			  <if test="isPro == 1">
-			  WHERE PRO_ID = #{peopleId}
-			  </if>
+			  WHERE PRO_ID = #{id}
 			  ORDER BY PAYMENT_NUMBER DESC) 
 		WHERE ROWNUM = 1
 	</select>
+	
+	<select id="getLastPaymentPEOPLE" parameterType="map" resultType="Talan.DTO.PaymentDTO">
+		SELECT PAYMENT_NUMBER, ESTIMATE_NUMBER 
+		FROM (SELECT PAYMENT_NUMBER, ESTIMATE_NUMBER, ROWNUM 
+			  FROM PAYMENT 
+			  WHERE PEOPLE_ID = #{id}
+			  ORDER BY PAYMENT_NUMBER DESC) 
+		WHERE ROWNUM = 1
+	</select>
+	
 
 	<select id="getLastEstimate" parameterType="map" resultType="String">
 		SELECT ESTIMATE_TITLE 
 		FROM (SELECT ESTIMATE_TITLE, ROWNUM 
 			  FROM ESTIMATE 
-			  WHERE PRO_ID = #{peopleId} 
+			  WHERE PRO_ID = #{id} 
 			  ORDER BY ESTIMATE_NUMBER DESC) 
 		WHERE ROWNUM = 1
 	</select>
@@ -32,21 +37,25 @@
 		SELECT REQUEST_TITLE 
 		FROM (SELECT REQUEST_TITLE, ROWNUM 
 			  FROM REQUEST 
-			  WHERE PEOPLE_ID = #{peopleId} 
+			  WHERE PEOPLE_ID = #{id} 
 			  ORDER BY REQUEST_NUMBER DESC) 
 		WHERE ROWNUM = 1
 	</select>
 	
-	<select id="getLastReview" parameterType="map" resultType="String">
+	<select id="getLastReviewPEOPLE" parameterType="map" resultType="String">
 		SELECT REVIEW_TITLE  
 		FROM (SELECT REVIEW_TITLE, ROWNUM 
 			  FROM REVIEW
-			  <if test="isPro == 0">
-			  WHERE PEOPLE_ID = #{peopleId}
-			  </if>
-			  <if test="isPro == 1">
-			  WHERE PRO_ID = #{peopleId}
-			  </if>
+			  WHERE PEOPLE_ID = #{id}
+			  ORDER BY REVIEW_NUMBER DESC) 
+		WHERE ROWNUM = 1
+	</select>
+	
+	<select id="getLastReviewPRO" parameterType="map" resultType="String">
+		SELECT REVIEW_TITLE  
+		FROM (SELECT REVIEW_TITLE, ROWNUM 
+			  FROM REVIEW
+			  WHERE PRO_ID = #{id}
 			  ORDER BY REVIEW_NUMBER DESC) 
 		WHERE ROWNUM = 1
 	</select>
@@ -55,7 +64,7 @@
 		SELECT INQUIRY_TITLE  
 		FROM (SELECT INQUIRY_TITLE, ROWNUM 
 			  FROM INQUIRY 
-			  WHERE PEOPLE_ID = #{peopleId}
+			  WHERE PEOPLE_ID = #{id}
 			  ORDER BY INQUIRY_NUMBER DESC) 
 		WHERE ROWNUM = 1
 	</select>
@@ -64,10 +73,27 @@
 		SELECT REPORT_CONTENT  
 		FROM (SELECT REPORT_CONTENT, ROWNUM 
 			  FROM REPORT 
-			  WHERE REPORT_PEOPLE = #{peopleId}
+			  WHERE REPORT_PEOPLE = #{id}
 			  ORDER BY REPORT_NUMBER DESC) 
 		WHERE ROWNUM = 1
 	</select>
+	
+	<select id="getRequest" parameterType="map" resultType="String">
+		SELECT REQUEST_TITLE FROM REQUEST WHERE PEOPLE_ID = #{id}
+	</select>
+	
+	<select id="getRequestNumber" parameterType="String" resultType="String">
+		SELECT REQUEST_NUMBER FROM ESTIMATE WHERE ESTIMATE_NUMBER = #{estimateNumber}
+	</select>
 
+	<select id="getEstimate" parameterType="String" resultType="String">
+		SELECT ESTIMATE_TITLE FROM ESTIMATE WHERE ESTIMATE_NUMBER = #{estimateNumber}
+	</select>
+	
+	<select id="getInfo" parameterType="map" resultType="Talan.DTO.PeopleDTO">
+		SELECT STORE_IMAGE_NAME, ORIGIN_IMAGE_NAME, IMAGE_PATH, NICKNAME, INTRO
+		FROM PEOPLE
+		WHERE PEOPLE_ID = #{id}
+	</select>
 
 </mapper>

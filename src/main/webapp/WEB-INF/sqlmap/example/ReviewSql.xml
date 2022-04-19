@@ -27,6 +27,10 @@
 	</update>
 	
 	<select id="getReviewList" parameterType="map" resultType="Talan.DTO.ReviewDTO">
+		SELECT * FROM REVIEW WHERE PEOPLE_ID = #{peopleId}
+	</select>
+	
+	<select id="getReviewListPro" parameterType="map" resultType="Talan.DTO.ReviewDTO">
 		SELECT * FROM REVIEW WHERE PRO_ID = #{proId}
 	</select>
 	

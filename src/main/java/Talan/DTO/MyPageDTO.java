@@ -11,8 +11,10 @@ public class MyPageDTO {
 	String intro;
 	String estimate;
 	String request;
-	String payment;
-	String review;
+	String paymentPro;
+	String paymentPeople;
+	String reviewPro;
+	String reviewPeople;
 	String inquiry;
 	String report;
 	
@@ -27,8 +29,10 @@ public class MyPageDTO {
 		info.put("intro", intro);
 		info.put("estimate", estimate);
 		info.put("request", request);
-		info.put("payment", payment);
-		info.put("review", review);
+		info.put("paymentPro", paymentPro);
+		info.put("paymentPeople", paymentPeople);
+		info.put("reviewPro", reviewPro);
+		info.put("reviewPeople", reviewPeople);
 		info.put("inquiry", inquiry);
 		info.put("report", report);
 		
@@ -37,6 +41,54 @@ public class MyPageDTO {
 	
 	
 	
+	public String getPaymentPro() {
+		return paymentPro;
+	}
+
+
+
+	public void setPaymentPro(String paymentPro) {
+		this.paymentPro = paymentPro;
+	}
+
+
+
+	public String getPaymentPeople() {
+		return paymentPeople;
+	}
+
+
+
+	public void setPaymentPeople(String paymentPeople) {
+		this.paymentPeople = paymentPeople;
+	}
+
+
+
+	public String getReviewPro() {
+		return reviewPro;
+	}
+
+
+
+	public void setReviewPro(String reviewPro) {
+		this.reviewPro = reviewPro;
+	}
+
+
+
+	public String getReviewPeople() {
+		return reviewPeople;
+	}
+
+
+
+	public void setReviewPeople(String reviewPeople) {
+		this.reviewPeople = reviewPeople;
+	}
+
+
+
 	public String getNickname() {
 		return nickname;
 	}
@@ -108,18 +160,6 @@ public class MyPageDTO {
 	}
 	public void setRequest(String request) {
 		this.request = request;
-	}
-	public String getPayment() {
-		return payment;
-	}
-	public void setPayment(String payment) {
-		this.payment = payment;
-	}
-	public String getReview() {
-		return review;
-	}
-	public void setReview(String review) {
-		this.review = review;
 	}
 	public String getInquiry() {
 		return inquiry;

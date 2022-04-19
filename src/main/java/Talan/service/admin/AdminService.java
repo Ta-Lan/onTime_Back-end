@@ -17,6 +17,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import Talan.DTO.AdminDTO;
+import Talan.DTO.MessageDTO;
 import Talan.DTO.ReportDTO;
 
 @Service
@@ -144,6 +145,13 @@ public class AdminService {
 			result = sqlSession.update("report.reportProcess", param);
 			if (result == 1 && param.get("reportStatus").toString().equals("1")) {
 				sqlSession.delete("admin.banishPeople", param);
+				List<MessageDTO> message = sqlSession.selectList("message.getChatList", param.get("reportTarget"));
+				sqlSession.delete("estimate.deleteEstimate", param.get("reportTarget"));
+				sqlSession.delete("request.deleteRequestOutPeople", param.get("reportTarget"));
+				for (int i = 0; i < message.size(); i++) {
+				sqlSession.delete("message.deleteChat", message.get(i).getChatNumber());
+				}
+					
 			}
 			transactionManager_sample.commit(status);
 			logger.info("========== 신고 처리 완료 : {}", result);

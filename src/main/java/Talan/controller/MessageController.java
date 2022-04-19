@@ -59,7 +59,7 @@ public class MessageController {
 		responseBodyMap.put("rsltCode", "0000");
 		responseBodyMap.put("rsltMsg", "Success");
 		responseBodyMap.put("Data", list);
-		
+
 		ModelAndView mv = new ModelAndView("defaultJsonView");
 		mv.addObject(Const.HEAD, reqHeadMap);
 		mv.addObject(Const.BODY, responseBodyMap);
@@ -69,7 +69,7 @@ public class MessageController {
 
 	// message send
 	@RequestMapping(method = RequestMethod.POST, value = "/api/message/send")
-	public ModelAndView regPeople(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView messageSend(HttpServletRequest request, HttpServletResponse response) {
 
 		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
 		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
@@ -120,10 +120,8 @@ public class MessageController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 
 		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
-		
-		
+
 		if (user != null) {
-			
 
 			reqBodyMap.put("loginId", user.get("loginId"));
 
@@ -144,6 +142,45 @@ public class MessageController {
 		} else if (user == null) {
 			responseBodyMap.put("rsltCode", "1003");
 			responseBodyMap.put("rsltMsg", "Login required.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
+	// 채팅방 입장할 때 채팅방 번호 가져오기
+	@RequestMapping(method = RequestMethod.POST, value = "/api/message/setChatRoom")
+	public ModelAndView setChatRoom(HttpServletRequest request, HttpServletResponse response) {
+
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+		String chatNumber = sqlSession.selectOne("message.getChatNumber", reqBodyMap);
+		
+		if (chatNumber == null) {
+			chatNumber = sqlSession.selectOne("message.newChatNumber");
+		}
+
+		if (!StringUtils.isEmpty(chatNumber)) {
+			responseBodyMap.put("rsltCode", "0000");
+			responseBodyMap.put("rsltMsg", "Success");
+			responseBodyMap.put("chatNumber", chatNumber);
+		} else {
+			responseBodyMap.put("rsltCode", "2003");
+			responseBodyMap.put("rsltMsg", "Data not found.");
 		}
 
 		ModelAndView mv = new ModelAndView("defaultJsonView");

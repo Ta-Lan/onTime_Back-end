@@ -58,5 +58,15 @@
      	where message_sender = #{loginId} or message_receiver = #{loginId}
      	group by chat_number) order by message_time desc
     </select>
+    
+    <delete id="deleteChat">
+    	DELETE FROM MESSAGE
+    	WHERE CHAT_NUMBER = #{chatNumber}
+    </delete>
+    
+    <select id="newChatNumber" resultType="String">
+    	SELECT CONCAT('CHAT',
+		NVL(MAX(SUBSTR(CHAT_NUMBER,5)),100000)+ 1) FROM MESSAGE
+    </select>
 
 </mapper>
