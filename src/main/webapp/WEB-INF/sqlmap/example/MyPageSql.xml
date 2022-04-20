@@ -79,7 +79,12 @@
 	</select>
 	
 	<select id="getRequest" parameterType="map" resultType="String">
-		SELECT REQUEST_TITLE FROM REQUEST WHERE PEOPLE_ID = #{id}
+		SELECT REQUEST_TITLE  
+		FROM (SELECT REQUEST_TITLE, ROWNUM 
+			  FROM REQUEST 
+			  WHERE PEOPLE_ID = #{id}
+			  ORDER BY REQUEST_NUMBER DESC) 
+		WHERE ROWNUM = 1
 	</select>
 	
 	<select id="getRequestNumber" parameterType="String" resultType="String">

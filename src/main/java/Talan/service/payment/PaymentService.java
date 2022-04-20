@@ -20,6 +20,7 @@ import Talan.DTO.EstimateDTO;
 import Talan.DTO.PaymentDTO;
 import Talan.DTO.PaymentDetailDTO;
 import Talan.DTO.PeopleDTO;
+import Talan.DTO.ReviewDTO;
 
 @Service
 public class PaymentService {
@@ -102,6 +103,11 @@ public class PaymentService {
 	public PaymentDetailDTO paymentDetail(Map<String, Object> param) {
 		PaymentDetailDTO payment = new PaymentDetailDTO();
 		payment = sqlSession.selectOne("payment.getPayment", param);
+		
+		if (payment.getReviewStatus() == '1') {
+			String reviewNumber = sqlSession.selectOne("review.getReviewNumber", param);
+			payment.setReviewNumber(reviewNumber);
+		}
 		return payment;
 	}
 	

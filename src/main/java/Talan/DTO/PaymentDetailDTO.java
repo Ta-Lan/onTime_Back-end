@@ -21,6 +21,17 @@ public class PaymentDetailDTO {
 	private String nickname;
 	private String proId;
 	private Character reviewStatus;
+	private String reviewNumber;
+	
+	
+
+	public String getReviewNumber() {
+		return reviewNumber;
+	}
+
+	public void setReviewNumber(String reviewNumber) {
+		this.reviewNumber = reviewNumber;
+	}
 
 	public Character getReviewStatus() {
 		return reviewStatus;

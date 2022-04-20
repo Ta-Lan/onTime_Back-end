@@ -19,7 +19,7 @@ public class ReviewDTO {
 	
 	public Map<String, Object> getReviewList() {
 		Map<String, Object> review = new HashMap<String, Object>();
-			review.put("paymentNumber", reviewNumber);
+			review.put("reviewNumber", reviewNumber);
 			review.put("paymentNumber", paymentNumber);
 			review.put("peopleId", peopleId);
 			review.put("reviewTitle", reviewTitle);

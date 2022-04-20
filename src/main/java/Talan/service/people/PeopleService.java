@@ -262,7 +262,7 @@ public class PeopleService {
 		String peoplePayment = new String();
 		if (paymentPeople != null) {
 		requestNumber = sqlSession.selectOne("mypage.getRequestNumber", paymentPeople.getEstimateNumber());
-		peoplePayment = sqlSession.selectOne("mypage.getRequest", requestNumber);
+		peoplePayment = sqlSession.selectOne("mypage.getRequest", param.get("id"));
 		} else {
 			requestNumber = null;
 			peoplePayment = null;
@@ -281,7 +281,8 @@ public class PeopleService {
 		dto.setReviewPro(sqlSession.selectOne("mypage.getLastReviewPRO", param));
 		dto.setReviewPeople(sqlSession.selectOne("mypage.getLastReviewPEOPLE", param));
 		dto.setInquiry(sqlSession.selectOne("mypage.getLastInquiry", param));
-
+		
+		System.out.println(dto);
 		return dto;
 	}
 
