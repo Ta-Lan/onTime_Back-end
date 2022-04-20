@@ -44,7 +44,7 @@
 	
 	<delete id="deletePeople">
 		DELETE FROM PEOPLE
-		WHERE  PEOPLE_ID = #{peopleId}
+		WHERE  PEOPLE_ID = #{id}
 	</delete>
 	
 	<select id="findId" parameterType="map" resultType="string">

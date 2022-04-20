@@ -33,7 +33,7 @@
 	</select>
 	
 	<select id="getEstimateMyList" parameterType="map" resultType="Talan.DTO.EstimateDTO">
-		SELECT * FROM ESTIMATE WHERE PRO_ID = #{proId}
+		SELECT * FROM ESTIMATE WHERE PRO_ID = #{proId} ORDER BY ESTIMATE_NUMBER DESC
 	</select>
 	
 	<update id="setEstimateMatched">
@@ -51,5 +51,10 @@
 	<select id="getEstimate" parameterType="map" resultType="Talan.DTO.EstimateDTO">
 		SELECT * FROM ESTIMATE WHERE ESTIMATE_NUMBER = #{estimateNumber}
 	</select>
+	
+	<delete id="deleteEstimate">
+		DELETE FROM ESTIMATE
+		WHERE PRO_ID = #{id}
+	</delete>
 	
 </mapper>

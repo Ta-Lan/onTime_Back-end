@@ -126,6 +126,7 @@ public class ProController {
 
 		return mv;
 	}
+	
 
 	// 자격증 검색
 	@RequestMapping(method = RequestMethod.POST, value = "/api/pro/searchLicense")

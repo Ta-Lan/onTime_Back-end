@@ -125,7 +125,7 @@ public class ReviewController {
 		return mv;
 	}
 
-	// 리뷰 리스트
+	// 리뷰 리스트 (PEOPLE 기준)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/review/list")
 	public ModelAndView reviewList(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
@@ -143,11 +143,56 @@ public class ReviewController {
 		if (session.getAttribute("user") != null) {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
 
-			reqBodyMap.put("proId", user.get("loginId"));
+			reqBodyMap.put("peopleId", user.get("loginId"));
 
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
 			List<Object> review = service.reviewList(reqBodyMap);
+
+			if (!StringUtils.isEmpty(review)) {
+				responseBodyMap.put("rsltCode", "0000");
+				responseBodyMap.put("rsltMsg", "Success");
+				responseBodyMap.put("list", review);
+			} else {
+				responseBodyMap.put("rsltCode", "2003");
+				responseBodyMap.put("rsltMsg", "Data not found.");
+			}
+		} else if (session.getAttribute("user") == null) {
+			responseBodyMap.put("rsltCode", "1003");
+			responseBodyMap.put("rsltMsg", "Login required.");
+		}
+
+		ModelAndView mv = new ModelAndView("defaultJsonView");
+		mv.addObject(Const.HEAD, reqHeadMap);
+		mv.addObject(Const.BODY, responseBodyMap);
+
+		return mv;
+	}
+
+	// 리뷰 리스트 (PRO 기준)
+	@RequestMapping(method = RequestMethod.POST, value = "/api/review/proList")
+	public ModelAndView reviewProList(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+
+		Map<String, Object> reqHeadMap = (Map<String, Object>) request.getAttribute(Const.HEAD);
+		Map<String, Object> reqBodyMap = (Map<String, Object>) request.getAttribute(Const.BODY);
+		Map<String, Object> responseBodyMap = new HashMap<String, Object>();
+
+		if (reqHeadMap == null) {
+			reqHeadMap = new HashMap<String, Object>();
+		}
+
+		reqHeadMap.put(Const.RESULT_CODE, Const.OK);
+		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
+
+		if (session.getAttribute("user") != null) {
+			
+			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+
+			reqBodyMap.put("proId", user.get("loginId"));
+
+			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
+
+			List<Object> review = service.reviewMyList(reqBodyMap);
 
 			if (!StringUtils.isEmpty(review)) {
 				responseBodyMap.put("rsltCode", "0000");

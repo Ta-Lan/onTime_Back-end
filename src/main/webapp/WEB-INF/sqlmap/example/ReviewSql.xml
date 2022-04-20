@@ -27,11 +27,21 @@
 	</update>
 	
 	<select id="getReviewList" parameterType="map" resultType="Talan.DTO.ReviewDTO">
-		SELECT * FROM REVIEW WHERE PRO_ID = #{proId}
+		SELECT * FROM REVIEW WHERE PEOPLE_ID = #{peopleId} ORDER BY REVIEW_NUMBER DESC
+	</select>
+	
+	<select id="getReviewListPro" parameterType="map" resultType="Talan.DTO.ReviewDTO">
+		SELECT * FROM REVIEW WHERE PRO_ID = #{proId} ORDER BY REVIEW_NUMBER DESC
 	</select>
 	
 	<select id="getReview" parameterType="map" resultType="Talan.DTO.ReviewDTO">
 		SELECT * FROM REVIEW WHERE REVIEW_NUMBER = #{reviewNumber}
+	</select>
+	
+	<select id="getReviewNumber" parameterType="map" resultType="String">
+		SELECT REVIEW_NUMBER
+		FROM REVIEW
+		WHERE PAYMENT_NUMBER = #{paymentNumber}
 	</select>
 	
 </mapper>

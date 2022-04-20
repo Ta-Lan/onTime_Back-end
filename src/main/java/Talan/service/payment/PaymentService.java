@@ -16,9 +16,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import Talan.DTO.EstimateDTO;
 import Talan.DTO.PaymentDTO;
 import Talan.DTO.PaymentDetailDTO;
 import Talan.DTO.PeopleDTO;
+import Talan.DTO.ReviewDTO;
 
 @Service
 public class PaymentService {
@@ -42,7 +44,10 @@ public class PaymentService {
         int result = 0;
         try{
             result = sqlSession.insert("payment.paymentInsert", param);
-            
+            if (result == 1) {
+            	EstimateDTO estimate = sqlSession.selectOne("estimate.getEstimate",param);
+            	sqlSession.update("request.setRequestClosed", estimate.getRequestNumber());
+            }
             transactionManager_sample.commit(status);
             logger.info("========== 결제 완료 : {}", result);
             
@@ -86,7 +91,7 @@ public class PaymentService {
 		for (int i = 0; i < payment.size(); i++) {
 			PeopleDTO peopleInfo = new PeopleDTO();
 			Map<String, Object> preList = new HashMap<String, Object>();
-			peopleInfo = sqlSession.selectOne("people.getPeopleInfo", payment.get(i).getPeopleId());
+			peopleInfo = sqlSession.selectOne("people.getPeopleInfo", payment.get(i).getProId());
 			preList.put("nickname", peopleInfo.getNickname());
 			preList.putAll(payment.get(i).getPaymentList());
 			list.add(preList);
@@ -98,6 +103,11 @@ public class PaymentService {
 	public PaymentDetailDTO paymentDetail(Map<String, Object> param) {
 		PaymentDetailDTO payment = new PaymentDetailDTO();
 		payment = sqlSession.selectOne("payment.getPayment", param);
+		
+		if (payment.getReviewStatus() == '1') {
+			String reviewNumber = sqlSession.selectOne("review.getReviewNumber", param);
+			payment.setReviewNumber(reviewNumber);
+		}
 		return payment;
 	}
 	

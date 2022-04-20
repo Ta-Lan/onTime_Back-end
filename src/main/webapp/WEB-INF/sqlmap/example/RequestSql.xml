@@ -107,4 +107,8 @@
 		DELETE FROM REQUEST WHERE REQUEST_NUMBER = #{requestNumber}
 	</delete>
 	
+	<delete id="deleteRequestOutPeople">
+		DELETE FROM REQUEST WHERE PEOPLE_ID = #{peopleId}
+	</delete>
+	
 </mapper>

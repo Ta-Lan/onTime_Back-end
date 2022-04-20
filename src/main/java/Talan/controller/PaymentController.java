@@ -1,6 +1,5 @@
 package Talan.controller;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 import Talan.DTO.EstimateDTO;
 import Talan.DTO.PaymentDetailDTO;
 import Talan.service.payment.PaymentService;
+import Talan.service.pro.ProService;
 import kr.msp.constant.Const;
 
 @Controller
@@ -37,6 +36,9 @@ public class PaymentController {
 
 	@Autowired(required = true)
 	private PaymentService service;
+	
+	@Autowired(required = true)
+	private ProService proService;
 
 	// 결제
 	@RequestMapping(method = RequestMethod.POST, value = "/api/payment/insert")
@@ -189,8 +191,20 @@ public class PaymentController {
 
 		if (session.getAttribute("user") != null) {
 			Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
+			String id =user.get("loginId").toString();
 			
+			int proRegisted = proService.isProRegisted(id);
+			boolean isPro = false;
+
+			if (proRegisted == 1) {
+				isPro = true;
+			}
+			
+			if (isPro == true) {
+				reqBodyMap.put("proId", user.get("loginId"));
+			} else {
 			reqBodyMap.put("peopleId", user.get("loginId"));
+			}
 			
 			logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
@@ -212,6 +226,7 @@ public class PaymentController {
 				responseBodyMap.put("requestContent", dto.getRequestContent());
 				responseBodyMap.put("nickname", dto.getNickname());
 				responseBodyMap.put("reviewStatus", dto.getReviewStatus());
+				responseBodyMap.put("reviewNumber", dto.getReviewNumber());
 			} else {
 				responseBodyMap.put("rsltCode", "2003");
 				responseBodyMap.put("rsltMsg", "Data not found.");
