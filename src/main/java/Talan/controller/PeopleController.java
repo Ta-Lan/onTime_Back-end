@@ -421,7 +421,8 @@ public class PeopleController {
 		reqHeadMap.put(Const.RESULT_MESSAGE, Const.SUCCESS);
 		
 		Map<String, Object> user = (Map<String, Object>) session.getAttribute("user");
-		reqBodyMap.put("id", user.get("loginId"));
+		System.out.println(user);
+		reqBodyMap.put("id", user.get("loginId").toString());
 
 		logger.info("======================= reqBodyMap : {}", reqBodyMap.toString());
 
