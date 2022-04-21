@@ -149,13 +149,15 @@ public class PeopleService {
 		int result = 0;
 		try {
 			result = sqlSession.delete("people.deletePeople", param);
-			if (result == 1) {
+			try {
 				List<MessageDTO> message = sqlSession.selectList("message.getChatList", param);
 				sqlSession.delete("estimate.deleteEstimate", param.get("peopleId"));
 				sqlSession.delete("request.deleteRequestOutPeople", param.get("peopleId"));
 				for (int i = 0; i < message.size(); i++) {
 					sqlSession.delete("message.deleteChat", message.get(i).getChatNumber());
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			transactionManager_sample.commit(status);
 			logger.info("========== 유저 탈퇴 완료 : {}", result);
